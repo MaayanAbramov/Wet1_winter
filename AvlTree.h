@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <cmath>
 #define ZERO_INIT 0
 #define ONE_STEP 1
 #define MINUS_ONE_INIT -1
@@ -15,11 +16,20 @@
 #define DIFF_ZERO 0
 #define DIFF_ONE 1
 #define DIFF_MINUS_ONE -1
+#define FLAG_KEY -1
 using namespace std;
 #include <stdexcept>
 
 template <class Key, class Value>
+struct tuples{
+    Key key;
+    Value val;
+};
+
+template <class Key, class Value>
 class AvlTree{
+
+
 public:
     class Node {
     public:
@@ -31,7 +41,13 @@ public:
         int heightFromRoot;
         int BF; //balance factor
     public:
-        Node(const Key& newKey, const Value& newValue) : father(nullptr), right(nullptr), left(nullptr), key
+        explicit Node(const Key& newkey, const Value& newvalue, Node* newLeft, Node* newRight, int newHeight) :
+        father(nullptr), right(newRight), left(newLeft), key(newkey), value(newvalue), heightFromRoot(newHeight), BF
+        (ZERO_INIT) {}
+        explicit Node(const Key& newKey) : father(nullptr), right(nullptr), left(nullptr), key(newKey), value
+        (DIFF_ZERO),
+                                         heightFromRoot(ZERO_INIT), BF(ZERO_INIT){}
+        explicit Node(const Key& newKey, const Value& newValue) : father(nullptr), right(nullptr), left(nullptr), key
                 (newKey),
                                                          value(newValue), heightFromRoot(ZERO_INIT), BF(ZERO_INIT){}
 
@@ -41,9 +57,9 @@ public:
     };
     AvlTree() : root(nullptr), numOfNodes(ZERO_INIT) {} //big three-------------------------------------
 
-    Node* deleteTrivialTree(); //deletes the tree with numOfNodes = 1
+    void deleteTrivialTree(); //deletes the tree with numOfNodes = 1
     Node* deleteParentOfOneBrotherOnly(); //deleting the root and initializing it to be the son. numOfNodes = 2
-    Node* deleteLeaf(Node* leafToRemove);
+    void deleteLeaf(Node* leafToRemove);
     void updateNodesTillRoot(Node* curr_node);
 
     void deleteNodeIfHasOneSon(const Key& keyToDelete, Node* curr_node); //connects between the grandpa and the son
@@ -78,8 +94,8 @@ public:
 
 
     Node* find(const Key& key, Node* curr_node) const;
-    int heightDetermination(Node* node);
-    int balanceFactorDetermination(Node* node);
+    static int heightDetermination(Node* node);
+    static int balanceFactorDetermination(Node* node);
     void updateFieldsAfterChangeInTree(Node* node);
     void rotationLL(Node* node);
     void printTreeWithInfo(Node* node, int depth, char branch);
@@ -90,12 +106,15 @@ public:
     void insertToAnEmptyTree(const Key& key, const Value& value);
     void insertAux(const Key& key, const Value& value);
     void recursive_insert(Node* curr_node, const Key& key, const Value& value, bool* createdAlready);
-
+    static Node* recursive_skeleton_build(int size, int height);
+    static Node* createCompleteTree(int numOfElements);
+    static void CutLeafs(Node* curr_node, int* amountOfLeafsExpectedToCut);
+    static void inorderFromArrayToTree(tuples<Key, Value>* array);
     //testing funcitons
     bool is_tree_valid(Node* root);
     int getHeight(Node* root);
     int BalanceFactor(Node* node);
-    int getWeight(Node* root);
+    //int getWeight(Node* root);
     void print2DHelper(Node* root, int space);
     void print2D(Node* root);
 public: //TO DO : change it to private
@@ -104,12 +123,12 @@ public: //TO DO : change it to private
 };
 
 template <class Key, class Value>
-typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::deleteTrivialTree() {
+void AvlTree<Key, Value>::deleteTrivialTree() {
     assert(numOfNodes > 0);
     numOfNodes--;
     delete root;
     root = nullptr;
-    return nullptr;
+    return;
 }
 
 template <class Key, class Value>
@@ -125,7 +144,7 @@ typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::deleteParentOfOneBrothe
 }
 
 template <class Key, class Value>
-typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::deleteLeaf(Node* leafToRemove) {
+void AvlTree<Key, Value>::deleteLeaf(Node* leafToRemove) {
     Node* leafsFather = leafToRemove->father;
     if (leafsFather->right == leafToRemove) {
         leafsFather->right = nullptr;
@@ -138,7 +157,7 @@ typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::deleteLeaf(Node* leafTo
     numOfNodes--;
     updateFieldsAfterChangeInTree(leafsFather);
     updateNodesTillRoot(leafsFather);
-    return leafsFather;
+    return;
 }
 template <class Key, class Value>
 void AvlTree<Key, Value>::updateNodesTillRoot(Node* curr_node) {
@@ -543,7 +562,80 @@ typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::swapNodes(Node* curr_no
     return curr_node;
 }
 
+template <class Key, class Value>
+typename AvlTree<Key,Value>::Node* AvlTree<Key, Value>::recursive_skeleton_build(int size, int height) {
+    if (size <= 1) {
+        Node* leaf_of_skeleton = new Node(FLAG_KEY);
+        return leaf_of_skeleton;
+    }
+    int curr_size = (size - 1)/2;
+    Node* left_sub_tree = recursive_skeleton_build(curr_size, height - 1);
+    Node* right_sub_tree = recursive_skeleton_build(curr_size, height - 1);
+    Value blank = Value();
+    Node* father_of_sub_trees = new Node(0, blank, left_sub_tree, right_sub_tree, height);
+    left_sub_tree->father = father_of_sub_trees;
+    right_sub_tree->father = father_of_sub_trees;
+    return father_of_sub_trees;
+}
 
+
+
+template <class Key, class Value>
+void AvlTree<Key,Value>::CutLeafs(Node* curr_node, int* amountOfLeafsExpectedToCut) {
+    if (curr_node == nullptr || *amountOfLeafsExpectedToCut == 0) {
+        return;
+    }
+    CutLeafs(curr_node->right, amountOfLeafsExpectedToCut);
+    CutLeafs(curr_node->left, amountOfLeafsExpectedToCut);
+
+    if (curr_node->key == FLAG_KEY) {
+
+        Node* parent = curr_node->father;
+        if (parent != nullptr) { //the trivial case(one node only)
+            if (parent->right == curr_node) {  //only for valgrind. We don't want to point to a place that was deleted
+                parent->right = nullptr;
+            }
+            else {
+                parent->left = nullptr;
+            }
+        }
+        (*amountOfLeafsExpectedToCut)--;
+        delete curr_node;
+    }
+    else {
+        curr_node->heightFromRoot= heightDetermination(curr_node);
+        curr_node->BF = balanceFactorDetermination(curr_node);
+    }
+
+
+
+}
+
+template <class Key, class Value>
+typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::createCompleteTree(int numOfElements) { //the caller
+    // will check size < 0 validation //throw invalid argument exception
+    if (numOfElements == 0) { // If requested an empty binary tree then return null
+        return nullptr;
+    }
+    int exponentOfUpperBound = int(floor(log2(double(numOfElements)))) + 1;
+    int numOfElementExpectedToDelete = pow(2, exponentOfUpperBound) - 1 - numOfElements;
+    int* ptrNumOfElementsExpectedToDelete = new int(numOfElementExpectedToDelete);
+    Node* rootOfSkeletonTree = recursive_skeleton_build(pow(2, exponentOfUpperBound)-1,exponentOfUpperBound-1);
+    CutLeafs(rootOfSkeletonTree, ptrNumOfElementsExpectedToDelete);
+    delete ptrNumOfElementsExpectedToDelete;
+    return rootOfSkeletonTree;
+
+
+}
+template <class Key, class Value>
+void inorderFromArrayToTree(typename AvlTree<Key, Value>::Node* currNode, tuples<Key, Value>* array, int index) {
+    assert(array != nullptr);
+    if (currNode == nullptr) {
+        return;
+    }
+    inorderFromArrayToTree(currNode->left, array, index-1);
+    currNode->key = array[index]
+}
 
 
 
