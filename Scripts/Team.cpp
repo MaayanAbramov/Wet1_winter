@@ -8,12 +8,12 @@ Team::Team() {
     this->teamId = 0;
     this->numParticipants = 0;
     this->sport = Sport::BOULDERING;
-    this->contestant = NULL;
+    this->contestants = NULL;
 }
 
 Team::Team(int teamId, Sport sport, int numParticipants) {
     this->teamId = teamId;
     this->sport = Sport::BOULDERING;
     this->numParticipants = numParticipants;
-    this->contestant = NULL;
+    this->contestants = NULL;
 }

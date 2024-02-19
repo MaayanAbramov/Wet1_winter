@@ -1,22 +1,23 @@
 //
-// Created by USER on 12/02/2024.
+// Created by maaya on 19/02/2024.
 //
 
-#ifndef WET1_WINTER_TEAMS_H
-#define WET1_WINTER_TEAMS_H
+#ifndef WINTERAVLTREE_TEAM_H
+#define WINTERAVLTREE_TEAM_H
 
 #include "wet1util.h"
 #include "AvlTree.h"
+#include "Contestant.h"
 
 class Team {
     int teamId{};
     Sport sport;
     int numParticipants;
-    AvlTree* contestant;
+    AvlTree<int, Contestant>* contestants;
+    //TO_DO: add 6 fields
 public:
     Team();
     Team(int teamId, Sport sport, int numParticipants);
 };
 
-
-#endif //WET1_WINTER_TEAMS_H
+#endif //WINTERAVLTREE_TEAM_H
