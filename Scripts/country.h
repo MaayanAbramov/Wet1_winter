@@ -6,8 +6,16 @@
 #define WET1_WINTER_COUNTRY_H
 
 
-class country {
+#include "AvlTree.h"
 
+class country {
+    int countryId;
+    int medals;
+    AvlTree Contestant;
+    AvlTree Team;
+public:
+    country(){}
+    country(int countryId, int medals);
 };
 
 

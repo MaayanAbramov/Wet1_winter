@@ -5,19 +5,17 @@
 #ifndef WET1_WINTER_CONTESTANT_H
 #define WET1_WINTER_CONTESTANT_H
 
+#include "wet1util.h"
+
 
 class contestant {
-    int contestantId;
-    int countryId;
-    int strength;
+    int contestantId{};
+    int countryId{};
+    int strength{};
     Sport sport;
 public:
-    contestant(int contestantId, int countryId, int strength, Sport sport){
-        this->contestantId = contestantId;
-        this->countryId = countryId;
-        this->strength = strength;
-        this->sport = sport;
-    }
+    contestant(){}
+    contestant(int contestantId, int countryId, int strength, Sport sport){}
 };
 
 

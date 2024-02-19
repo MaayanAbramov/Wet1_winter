@@ -3,3 +3,8 @@
 //
 
 #include "country.h"
+
+country::country(int countryId, int medals) {
+    this->countryId = countryId;
+    this->medals = medals;
+}
