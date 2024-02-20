@@ -9,7 +9,7 @@
 //
 // Created by USER on 12/02/2024.
 //
-
+#include "AvlTree.h"
 #include "wet1util.h"
 
 
@@ -18,11 +18,21 @@ class Contestant {
     int countryId;
     int strength;
     Sport sport;
-    //TO_DO::add boolean of < is_specail_sorted
+    bool is_by_strength_sorted;
+    AvlTree<int, Contestant> tree1ByStrength; //the bigger
+    AvlTree<int, Contestant> tree2ByStrength;// the middle
+    AvlTree<int, Contestant> tree3ByStrength;//the lowers
+    AvlTree<int, Contestant> tree1ById; //the bigger
+    AvlTree<int, Contestant> tree2ById; // the middle
+    AvlTree<int, Contestant> tree3ById; //the lowers
+
 public:
     Contestant();
-    Contestant(int contestantId, int countryId, int strength, Sport sport);
-    //TO_DO: add operatorOverloading
+    Contestant(int contestantId, int countryId, int strength, Sport sport, bool is_by_strength_sorted);
+    ~Contestant() = default;
+    friend bool operator<(const Contestant& num1, const Contestant& num2);
+    friend bool operator>(const Contestant& num1, const Contestant& num2);
+
 
 };
 

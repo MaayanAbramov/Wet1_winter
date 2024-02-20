@@ -33,7 +33,7 @@ StatusType olympics_t::remove_country(int countryId) {
     auto node = countries->find(countryId, countries->root);
     if (node == nullptr)
         return StatusType::FAILURE;
-    if (node->getValue()->getContestant()->root != nullptr || node->getValue()->getTeam()->root != nullptr ) {
+    if (node->getValue()->getContestants()->root != nullptr || node->getValue()->getTeam()->root != nullptr ) {
         return StatusType::FAILURE;
     }
     try {
@@ -50,11 +50,21 @@ StatusType olympics_t::add_team(int teamId, int countryId, Sport sport) {
         return StatusType::INVALID_INPUT;
     }
     if (teams->find(teamId, teams->root) != nullptr || countries->find(countryId, countries->root) != nullptr) {
-        return StatusType::FAILURE;
+        return StatusType::FAILURE; //meaning if the team already existed
     }
     try {
-        Team* teamToAdd = Team()
-        teams->insertAux(teamId, )
+        Team toAdd = Team(teamId, sport, 0); //numParticipant = 0
+        teams->insertAux(teamId, toAdd);
+        AvlTree<int, Country>::Node* nodeOfCountry = countries->find(countryId, countries->root);
+        if (nodeOfCountry == nullptr) {
+            return StatusType::FAILURE;
+        }
+        nodeOfCountry->value.getTeams()->insertAux(teamId, toAdd);
+        return StatusType::SUCCESS;
+
+    }
+    catch(std::bad_alloc& ba) {
+        return StatusType::ALLOCATION_ERROR;
     }
 
 }

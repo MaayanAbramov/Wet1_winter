@@ -9,10 +9,10 @@ Country::Country(int countryId, int medals) {
     this->medals = medals;
 }
 
-AvlTree<int, Contestant> *Country::getContestant() {
+AvlTree<int, Contestant> *Country::getContestants() {
     return this->Contestants;
 }
 
-AvlTree<int, Team> *Country::getTeam() {
+AvlTree<int, Team> *Country::getTeams() {
     return this->Teams;
 }

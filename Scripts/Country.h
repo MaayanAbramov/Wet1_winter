@@ -20,8 +20,8 @@ class Country {
 public:
     Country();
     Country(int countryId, int medals);
-    AvlTree<int, Team>* getTeam();
-    AvlTree<int, Contestant>* getContestant();
+    AvlTree<int, Team>* getTeams();
+    AvlTree<int, Contestant>* getContestants();
 };
 
 #endif //WINTERAVLTREE_COUNTRY_H
