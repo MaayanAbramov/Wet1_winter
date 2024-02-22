@@ -19,12 +19,7 @@ class Contestant {
     int strength;
     Sport sport;
     bool is_by_strength_sorted;
-    AvlTree<int, Contestant> tree1ByStrength; //the bigger
-    AvlTree<int, Contestant> tree2ByStrength;// the middle
-    AvlTree<int, Contestant> tree3ByStrength;//the lowers
-    AvlTree<int, Contestant> tree1ById; //the bigger
-    AvlTree<int, Contestant> tree2ById; // the middle
-    AvlTree<int, Contestant> tree3ById; //the lowers
+
 
 public:
     Contestant();

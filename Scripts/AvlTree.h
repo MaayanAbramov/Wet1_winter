@@ -20,12 +20,6 @@
 using namespace std;
 #include <stdexcept>
 
-template <class Key, class Value>
-struct tuples{
-public:
-    Key key;
-    Value val;
-};
 
 template <class Key, class Value>
 class AvlTree{
@@ -70,7 +64,10 @@ public:
     // the swapped till the root
     Node* findNextNodeInOrder(const Key& key);
     Node* swapNodes(Node* toDelete, Node* NextInorder);
-    void remove(const Key& keyToRemove);
+    Node* remove(const Key& keyToRemove); //should check before calling if numOfNodes == 0 then return failure, there
+    // shouldnt be a call if numOfNodes == 0
+    //returns null in the case of not finding the key
+    //returns the root in the success case
 
     void DeleteWholeTree(Node* node) {
         if (node == nullptr) { //if we reached a step under the leaves it means we reached the end
@@ -108,9 +105,11 @@ public:
     void insertAux(const Key& key, const Value& value);
     void recursive_insert(Node* curr_node, const Key& key, const Value& value, bool* createdAlready);
     static Node* recursive_skeleton_build(int size, int height);
+    //please notice the caller should update root to be the result and numOfElements
     static Node* createCompleteTree(int numOfElements);
     static void CutLeafs(Node* curr_node, int* amountOfLeafsExpectedToCut);
-    static void inorderFromArrayToTree(Node* currNode, tuples<Key, Value>* array, int* index);
+    static void inorderFromArrayToTree(AvlTree<Key, Value>::Node* currNode, Key* arrayOfKeys, Value* arrayOfValues,
+                                       int* index);
     //testing funcitons
     bool is_tree_valid(Node* root);
     int getHeight(Node* root);
@@ -401,16 +400,18 @@ Value& value, bool* createdAlready) {
 
 
 template <class Key, class Value>
-void AvlTree<Key, Value>::remove(const Key& keyToRemove) { //help functions should be recursive, to
+typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::remove(const Key& keyToRemove) { //help functions should be
+    // recursive, to
     // update the route
     // till the root
     Key copy = keyToRemove;
-    if (root == nullptr) {
+    /*if (root == nullptr) {
         throw std::bad_alloc();
-    }
+    }*/
+    assert(numOfNodes != 0);
     Node* toRemove = find(keyToRemove, root);
-    if (toRemove == nullptr) {
-        throw std::bad_alloc();
+    if (toRemove == nullptr) { //in this case the caller function will return ALLOCATIONERROR
+        return nullptr;
     }
     if (toRemove->left == nullptr && toRemove->right == nullptr && toRemove != root) {
         deleteLeaf(toRemove);
@@ -425,6 +426,7 @@ void AvlTree<Key, Value>::remove(const Key& keyToRemove) { //help functions shou
     else {
         deleteNodeIfHasTwoSons(&copy, root);
     }
+    return root; //we dont really use this
 }
 
 template <class Key, class Value>
@@ -615,6 +617,7 @@ void AvlTree<Key,Value>::CutLeafs(Node* curr_node, int* amountOfLeafsExpectedToC
 template <class Key, class Value>
 typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::createCompleteTree(int numOfElements) { //the caller
     // will check size < 0 validation //throw invalid argument exception
+    //please notice the caller should update root to be the result and numOfElements
     if (numOfElements == 0) { // If requested an empty binary tree then return null
         return nullptr;
     }
@@ -633,20 +636,20 @@ template<class Key, class Value>
 void AvlTree<Key, Value>::inorderFromArrayToTree(AvlTree::Node *currNode, tuples<Key, Value> *array, int *index) {
 
 }*/
-/*
+
 template <class Key, class Value>
-void inorderFromArrayToTree(typename AvlTree<Key, Value>::Node* currNode, tuples<Key, Value>* array, int* index) {
-    assert(array != nullptr);
+void AvlTree<Key, Value>::inorderFromArrayToTree(AvlTree<Key, Value>::Node* currNode, Key* arrayOfKeys, Value*
+arrayOfValues, int* index) {
+    assert(arrayOfKeys != nullptr && arrayOfValues != nullptr);
     if (currNode == nullptr) {
         return;
     }
-    inorderFromArrayToTree(currNode->left, array, index);
-    currNode->key = (array + *index)->key;
-
-    currNode->value = (array + *index)->val;
-    (*index++);
-    inorderFromArrayToTree(currNode->right, array, index);
-}*/
+    inorderFromArrayToTree(currNode->left, arrayOfKeys, arrayOfValues, index);
+    currNode->key = arrayOfKeys[*index];
+    currNode->value = arrayOfValues[*index];
+    (*index)++;
+    inorderFromArrayToTree(currNode->right, arrayOfKeys, arrayOfValues, index);
+}
 
 
 

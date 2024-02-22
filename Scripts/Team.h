@@ -10,14 +10,24 @@
 #include "Contestant.h"
 
 class Team {
-    int teamId{};
+    int teamId;
     Sport sport;
     int numParticipants;
-    AvlTree<int, Contestant>* contestants;
-    //TO_DO: add 6 fields
+    int myCountry;
+    AvlTree<int, Contestant>* teamContestants;
+
+    AvlTree<int, Contestant>* treeByIdBigVal;
+    AvlTree<int, Contestant>* treeByIdMedVal;
+    AvlTree<int, Contestant>* treeByIdSmallVal;
+    AvlTree<int, Contestant>* treeByStrengthBigVal;
+    AvlTree<int, Contestant>* treeByStrengthMedVal;
+    AvlTree<int, Contestant>* treeByStrengthSmallVal;
+
 public:
     Team();
-    Team(int teamId, Sport sport, int numParticipants);
+    Team(int teamId, Sport sport, int numParticipants, int countryId);
+    ~Team() = default;
+    int getCountryId() const;
 };
 
 #endif //WINTERAVLTREE_TEAM_H

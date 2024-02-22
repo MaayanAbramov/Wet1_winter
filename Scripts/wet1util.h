@@ -1,10 +1,4 @@
 //
-// Created by maaya on 19/02/2024.
-//
-
-#ifndef WINTERAVLTREE_WET1UTIL_H
-#define WINTERAVLTREE_WET1UTIL_H
-//
 // 234218 Data Structures 1.
 // Semester: 2024A (winter).
 // Wet Exercise #1.
@@ -17,6 +11,9 @@
 //
 // DO NOT use the preprocessors in your own code files.
 //
+
+#ifndef WET1_UTIL_H_
+#define WET1_UTIL_H_
 
 #include <stdexcept>
 
@@ -56,5 +53,4 @@ public:
 };
 
 
-
-#endif //WINTERAVLTREE_WET1UTIL_H
+#endif // WET1_UTIL_H_

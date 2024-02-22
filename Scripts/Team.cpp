@@ -8,12 +8,18 @@ Team::Team() {
     this->teamId = 0;
     this->numParticipants = 0;
     this->sport = Sport::BOULDERING;
-    this->contestants = NULL;
+    this->myCountry = 0;
+
 }
 
-Team::Team(int teamId, Sport sport, int numParticipants) {
+Team::Team(int teamId, Sport sport, int numParticipants, int countryId) {
     this->teamId = teamId;
     this->sport = Sport::BOULDERING;
     this->numParticipants = numParticipants;
-    this->contestants = NULL;
+    this->myCountry = countryId;
+
+}
+
+int Team::getCountryId() const{
+    return this->myCountry;
 }
