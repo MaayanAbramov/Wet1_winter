@@ -92,7 +92,8 @@ public:
 
 
     Node* find(const Key& key, Node* curr_node) const;
-    Node* findMax(Node* curr_root);
+    Node* findMax(Node* curr_node);
+    Node* findMin(Node* curr_node);
     static int heightDetermination(Node* node);
     static int balanceFactorDetermination(Node* node);
     void updateFieldsAfterChangeInTree(Node* node);
@@ -653,6 +654,21 @@ arrayOfValues, int* index) {
     inorderFromArrayToTree(currNode->right, arrayOfKeys, arrayOfValues, index);
 }
 
+template <class Key, class Value>
+typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::findMax(Node* curr_node) {
+    if (curr_node->right == nullptr) {
+        return curr_node;
+    }
+    return findMax(curr_node->right);
+}
+
+template <class Key, class Value>
+typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::findMin(Node* curr_node) {
+    if (curr_node->left == nullptr) {
+        return curr_node;
+    }
+    return findMin(curr_node->left);
+}
 
 
 #endif //WINTERAVLTREE_AVLTREE_H

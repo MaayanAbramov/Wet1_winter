@@ -24,6 +24,7 @@ class Contestant {
 public:
     Contestant();
     Contestant(int contestantId, int countryId, int strength, Sport sport, bool is_by_strength_sorted);
+    Contestant(const Contestant& other);
     ~Contestant() = default;
     friend bool operator<(const Contestant& num1, const Contestant& num2);
     friend bool operator>(const Contestant& num1, const Contestant& num2);

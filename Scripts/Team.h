@@ -26,21 +26,29 @@ class Team {
     AvlTree<int, Contestant>* treeByStrengthMedVal;
     AvlTree<int, Contestant>* treeByStrengthSmallVal;
     int* stateOfBalance;
-    int maxInTreeByStrengthBigVal;
-    int maxInTreeByStrengthMedVal;
+    int maxInTreeByIdBigVal;
+    int maxInTreeByIdMedVal;
+    int maxInTreeByIdSmallVal;
+    int minInTreeByIdBigVal;
+    int minInTreeByIdMedVal;
+    int minInTreeByIdSmallVal;
+
     int maxInTreeByStrengthSmallVal;
-    int minInTreeByStrengthBigVal;
-    int minInTreeByStrengthMedVal;
-    int minInTreeByStrengthSmallVal;
+    int maxInTreeByStrengthMedVal;
+    int maxInTreeByStrengthBigVal;
 public:
     Team();
     Team(int teamId, Sport sport, int numParticipants, int countryId);
     ~Team() = default;
     int getCountryId() const;
     void updateStateOfBalance();
-    void makePlaceInTreeByStrengthBigVal();
-    void makePlaceInTreeByStrengthMedVal();
-    void makePlaceInTreeByStrengthSmallVal();
+    void makePlaceInTreeByIdBigVal();
+    void makePlaceInTreeByIdMedVal();
+    void makePlaceInTreeByIdSmallVal();
+
+    void updateTreeByStrengthSmallVal();
+    void updateTreeByStrengthMedVal();
+    void updateTreeByStrengthBigVal();
     void addContestant(int contestantId, int countryId, int strength, Sport sport);
     // about the Contestant
     int get_maxInTreeByStrengthBigVal() {

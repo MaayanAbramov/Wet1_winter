@@ -20,6 +20,13 @@ Contestant::Contestant(int contestantId, int countryId, int strength, Sport spor
     this->sport = sport;
     this->is_by_strength_sorted = is_by_strength_sorted_;
 }
+Contestant::Contestant(const Contestant& other) {
+    this->contestantId = other.contestantId;
+    this->countryId = other.countryId;
+    this->strength = other.strength;
+    this->sport = other.sport;
+    this->is_by_strength_sorted = other.is_by_strength_sorted;
+}
 
 bool operator<(const Contestant& num1, const Contestant& num2) {
     if (num1.is_by_strength_sorted) {
