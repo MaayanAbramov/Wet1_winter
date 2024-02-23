@@ -92,6 +92,7 @@ public:
 
 
     Node* find(const Key& key, Node* curr_node) const;
+    Node* findMax(Node* curr_root);
     static int heightDetermination(Node* node);
     static int balanceFactorDetermination(Node* node);
     void updateFieldsAfterChangeInTree(Node* node);
@@ -375,6 +376,7 @@ Value& value, bool* createdAlready) {
     }
     if (key < *(curr_node->getKey()) && curr_node->left == nullptr) {
         numOfNodes++;
+        //Value* valueToInsert = new Value(value)
         curr_node->left = new Node(key, value);
         curr_node->left->father = curr_node;
         updateFieldsAfterChangeInTree(curr_node->left);

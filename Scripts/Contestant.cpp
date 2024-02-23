@@ -23,8 +23,9 @@ Contestant::Contestant(int contestantId, int countryId, int strength, Sport spor
 
 bool operator<(const Contestant& num1, const Contestant& num2) {
     if (num1.is_by_strength_sorted) {
-        return num1.strength < num2.strength;
-                                                                                                                                                                                                        movie2_id);
+        return num1.strength < num2.strength || ((num1.strength < num2.strength) && (num1.contestantId < num2
+        .contestantId));
+
     }
     assert(num1.is_by_strength_sorted != -1);
     return num1.contestantId < num2.contestantId;
@@ -33,7 +34,7 @@ bool operator<(const Contestant& num1, const Contestant& num2) {
 
 bool operator>(const Contestant& num1, const Contestant& num2) {
     if (num1.is_by_strength_sorted) {
-        return num1.strength > num2.strength;
+        return num1.strength > num2.strength || ((num1.strength > num2.strength) && (num1.contestantId > num2.strength));
     }
     assert(num1.is_by_strength_sorted != -1);
     return num1.contestantId > num2.contestantId;
