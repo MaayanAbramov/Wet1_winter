@@ -28,7 +28,12 @@ public:
     ~Contestant() = default;
     friend bool operator<(const Contestant& num1, const Contestant& num2);
     friend bool operator>(const Contestant& num1, const Contestant& num2);
-
+    int get_contestantId() const;
+    int get_countryId() const;
+    int get_strength() const;
+    Sport get_sport() const;
+    bool get_is_by_strength_sorted() const;
+    void set_is_by_strength_sorted(bool is_by_strength);
 
 };
 

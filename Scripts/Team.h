@@ -25,7 +25,7 @@ class Team {
     AvlTree<int, Contestant>* treeByStrengthBigVal;
     AvlTree<int, Contestant>* treeByStrengthMedVal;
     AvlTree<int, Contestant>* treeByStrengthSmallVal;
-    int* stateOfBalance;
+    int stateOfBalance[3];
     int maxInTreeByIdBigVal;
     int maxInTreeByIdMedVal;
     int maxInTreeByIdSmallVal;
@@ -41,25 +41,28 @@ public:
     Team(int teamId, Sport sport, int numParticipants, int countryId);
     ~Team() = default;
     int getCountryId() const;
+    int getStateOfBalance(int index);
     void updateStateOfBalance();
-    void makePlaceInTreeByIdBigVal();
-    void makePlaceInTreeByIdMedVal();
+    /*void makePlaceInTreeByIdBigVal();
+    void makePlaceInTreeByIdMedVal();*/
     void makePlaceInTreeByIdSmallVal();
 
-    void updateTreeByStrengthSmallVal();
-    void updateTreeByStrengthMedVal();
-    void updateTreeByStrengthBigVal();
-    void addContestant(int contestantId, int countryId, int strength, Sport sport);
+    void updateTreeByStrengthSmallVal(); //notice : name not correct!. this one updates both of small trees
+    void updateTreeByStrengthMedVal();//notice : name not correct!. this one updates both of med trees
+    void updateTreeByStrengthBigVal(); //notice : name not correct!. this one updates both of big trees
+    //void addContestant(int contestantId, int countryId, int strength, Sport sport);
     // about the Contestant
-    int get_maxInTreeByStrengthBigVal() {
-        return maxInTreeByStrengthBigVal;
-    }
-    int get_maxInTreeByStrengthMedVal() {
-        return maxInTreeByStrengthMedVal;
-    }
-    int get_maxInTreeByStrengthSmallVal() {
-        return maxInTreeByStrengthSmallVal;
-    }
+    int get_maxInTreeByStrengthBigVal();
+    int get_maxInTreeByStrengthMedVal();
+    int get_maxInTreeByStrengthSmallVal();
+    AvlTree<int, Contestant>* get_treeByIdBigVal();
+    AvlTree<int, Contestant>* get_treeByIdMedVal();
+    AvlTree<int, Contestant>* get_treeByIdSmallVal();
+
+
+    AvlTree<int, Contestant>* get_treeByStrengthBigVal();
+    AvlTree<int, Contestant>* get_treeByStrengthMedVal();
+    AvlTree<int, Contestant>* get_treeByStrengthSmallVal();
 };
 
 #endif //WINTERAVLTREE_TEAM_H

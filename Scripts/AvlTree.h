@@ -64,7 +64,7 @@ public:
     // the swapped till the root
     Node* findNextNodeInOrder(const Key& key);
     Node* swapNodes(Node* toDelete, Node* NextInorder);
-    Node* remove(const Key& keyToRemove); //should check before calling if numOfNodes == 0 then return failure, there
+    void remove(const Key& keyToRemove); //should check before calling if numOfNodes == 0 then return failure, there
     // shouldnt be a call if numOfNodes == 0
     //returns null in the case of not finding the key
     //returns the root in the success case
@@ -401,20 +401,17 @@ Value& value, bool* createdAlready) {
 
 
 
-
 template <class Key, class Value>
-typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::remove(const Key& keyToRemove) { //help functions should be
-    // recursive, to
+void AvlTree<Key, Value>::remove(const Key& keyToRemove) { //help functions should be recursive, to
     // update the route
     // till the root
     Key copy = keyToRemove;
-    /*if (root == nullptr) {
-        throw std::bad_alloc();
-    }*/
-    assert(numOfNodes != 0);
+    if (root == nullptr) {
+        throw invalid_argument("The key is empty");
+    }
     Node* toRemove = find(keyToRemove, root);
-    if (toRemove == nullptr) { //in this case the caller function will return ALLOCATIONERROR
-        return nullptr;
+    if (toRemove == nullptr) {
+        throw invalid_argument("The key does not exist");
     }
     if (toRemove->left == nullptr && toRemove->right == nullptr && toRemove != root) {
         deleteLeaf(toRemove);
@@ -429,9 +426,7 @@ typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::remove(const Key& keyTo
     else {
         deleteNodeIfHasTwoSons(&copy, root);
     }
-    return root; //we dont really use this
 }
-
 template <class Key, class Value>
 void AvlTree<Key, Value>::deleteNodeIfHasOneSon(const Key& keyToDelete, Node* curr_node) { //may be need update till
     // the root, even thought it looks like not because height of subtree of root changes only in 1

@@ -46,3 +46,22 @@ bool operator>(const Contestant& num1, const Contestant& num2) {
     assert(num1.is_by_strength_sorted != -1);
     return num1.contestantId > num2.contestantId;
 }
+
+int Contestant::get_contestantId() const {
+    return contestantId;
+}
+int Contestant::get_countryId() const {
+    return countryId;
+}
+int Contestant::get_strength() const {
+    return strength;
+}
+Sport Contestant::get_sport() const {
+    return sport;
+}
+bool Contestant::get_is_by_strength_sorted() const {
+    return is_by_strength_sorted;
+}
+void Contestant::set_is_by_strength_sorted(bool is_by_strength) {
+    this->is_by_strength_sorted = is_by_strength;
+}

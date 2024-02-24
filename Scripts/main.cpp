@@ -1,32 +1,37 @@
 #include <iostream>
 #include "AvlTree.h"
+#include "Team.h"
+#include "Contestant.h"
+#include "wet1util.h"
 
 int main() {
-    AvlTree<int, int> tree;
 
-    /*tree.insertAux(5, 2);
-    tree.insertAux(2, 2);
-    tree.insertAux(6, 2);
-    tree.insertAux(1, 2);
-    tree.insertAux(3, 2);
-    tree.insertAux(7, 2);
-    tree.insertAux(4, 2);
+    Team team = Team(1, Sport::ACROBATICS, 0, 123); // Example values for teamId, sport, numParticipants, and countryId
+    team.updateStateOfBalance();
 
+    Contestant num1 = Contestant(2, 0, 1, Sport::ACROBATICS, false);
+    team.get_treeByIdSmallVal()->insertAux(2, num1);
+    num1.set_is_by_strength_sorted(true);
+    team.get_treeByStrengthSmallVal()->insertAux(1, num1);
+    // Update the state of balance
+    team.updateTreeByStrengthSmallVal();
 
-    tree.printTreeWithInfo(tree.root, 0, '-');
-    tree.remove(5);
-    tree.printTreeWithInfo(tree.root, 0, '-');
-*/
-    AvlTree<int,int>::Node* res = AvlTree<int,int>::createCompleteTree(10);
-    tree.root = res;
-    tree.numOfNodes = 10;
-    tree.printTreeWithInfo(tree.root, 0, '-');
-    int index = 0;
-    int arrayOfKeys[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    int arrayOfValues[] = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
-    tree.inorderFromArrayToTree(tree.root, arrayOfKeys, arrayOfValues, &index);
-    tree.printTreeWithInfo(tree.root, 0, '-');
+    Contestant num2 = Contestant(5, 0, 7, Sport::ACROBATICS, false);
+    team.get_treeByIdMedVal()->insertAux(5, num2);
+    num2.set_is_by_strength_sorted(true);
+    team.get_treeByStrengthMedVal()->insertAux(7, num2);
+    // Update the state of balance
+    team.updateTreeByStrengthMedVal();
 
 
+    for (int i = 0 ; i < 3 ; i++) {
+        cout << "#updateStateOfBalance " << team.getStateOfBalance(i) <<endl;
+    }
+    cout << "------------------------------------" << endl;
+    team.makePlaceInTreeByIdSmallVal();
+    for (int i = 0 ; i < 3 ; i++) {
+        cout << "#updateStateOfBalance " << team.getStateOfBalance(i) <<endl;
+    }
+    cout << "------------------------------------" << endl;
     return 0;
 }
