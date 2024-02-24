@@ -146,7 +146,15 @@ void Team::makePlaceInTreeByIdSmallVal() {
         treeByIdMedVal->insertAux(toDonate.get_contestantId(), toDonate);//remmember to insert to both of the trees
         toDonate.set_is_by_strength_sorted(true);
         treeByStrengthMedVal->insertAux(toDonate.get_strength(), toDonate);
-        updateTreeByStrengthSmallVal(); //this one also updates the stated array
+        if (treeByIdSmallVal->numOfNodes == 0) {
+            this->maxInTreeByStrengthSmallVal = 0;
+            this->maxInTreeByIdSmallVal = 0;
+            this->minInTreeByIdSmallVal = 0;
+            updateStateOfBalance();
+        }
+        else {
+            updateTreeByStrengthSmallVal(); //this one also updates the stated array
+        }
         updateTreeByStrengthMedVal();
     }
     else { //if stateOfBalnce[1] == 1, Med must donate to Big. And Small must donate to Med.
@@ -162,8 +170,17 @@ void Team::makePlaceInTreeByIdSmallVal() {
         treeByIdBigVal->insertAux(toMoveToBig.get_contestantId(), toMoveToBig);
         toMoveToBig.set_is_by_strength_sorted(true);
         treeByStrengthBigVal->insertAux(toMoveToBig.get_strength(), toMoveToBig);
-        updateTreeByStrengthMedVal();//this one also updates the stated array
+        if (treeByIdMedVal->numOfNodes == 0) {
+            this->maxInTreeByStrengthMedVal = 0;
+            this->maxInTreeByIdMedVal = 0;
+            this->minInTreeByIdMedVal = 0;
+            updateStateOfBalance();
+        }
+        else {
+            updateTreeByStrengthMedVal();
+        }
         updateTreeByStrengthBigVal();
+        //this one also updates the stated array
         //now donating from small to med(now must be state[1] != 1)
         auto NodeToMoveToMed = treeByIdSmallVal->find(maxInTreeByIdSmallVal, treeByIdSmallVal->root);
         Contestant toMoveToMed = *(NodeToMoveToMed->getValue());
@@ -172,7 +189,15 @@ void Team::makePlaceInTreeByIdSmallVal() {
         treeByIdMedVal->insertAux(toMoveToMed.get_contestantId(), toMoveToMed);
         toMoveToMed.set_is_by_strength_sorted(true);
         treeByStrengthMedVal->insertAux(toMoveToMed.get_strength(), toMoveToMed);
-        updateTreeByStrengthSmallVal();//this one also updates the stated array
+        if (treeByIdSmallVal->numOfNodes == 0) {
+            this->maxInTreeByStrengthSmallVal = 0;
+            this->maxInTreeByIdSmallVal = 0;
+            this->minInTreeByIdSmallVal = 0;
+            updateStateOfBalance();
+        }
+        else {
+            updateTreeByStrengthSmallVal(); //this one also updates the stated array
+        }//this one also updates the stated array
         updateTreeByStrengthMedVal();
 
     }
