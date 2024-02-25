@@ -14,7 +14,8 @@ class Team {
     Sport sport;
     int numParticipants;
     int myCountry;
-    AvlTree<int, Contestant>* team_whole_contestants;
+    AvlTree<int, Contestant>* team_whole_contestants_by_id;
+    AvlTree<int, Contestant>* team_whole_contestants_by_strength;
 
 
     AvlTree<int, Contestant>* treeByIdBigVal;
@@ -36,6 +37,8 @@ class Team {
     int maxInTreeByStrengthSmallVal;
     int maxInTreeByStrengthMedVal;
     int maxInTreeByStrengthBigVal;
+
+    int optimalTeamStrength; //the max strength of a team after deleting the three "weakest" members
 public:
     Team();
     Team(int teamId, Sport sport, int numParticipants, int countryId);
@@ -50,11 +53,16 @@ public:
     void updateTreeByStrengthSmallVal(); //notice : name not correct!. this one updates both of small trees
     void updateTreeByStrengthMedVal();//notice : name not correct!. this one updates both of med trees
     void updateTreeByStrengthBigVal(); //notice : name not correct!. this one updates both of big trees
-    //void addContestantToATeam(int contestantId, int countryId, int strength, Sport sport);
+    void addContestantToATeam(int contestantId, int countryId, int strength, Sport sport);
+    //void updateOptimalTeamStrength();
     // about the Contestant
     int get_maxInTreeByStrengthBigVal();
     int get_maxInTreeByStrengthMedVal();
     int get_maxInTreeByStrengthSmallVal();
+
+    int get_optimalTeamStrength() const;
+    void set_optimalTeamStrength(int optimalVal);
+
     AvlTree<int, Contestant>* get_treeByIdBigVal();
     AvlTree<int, Contestant>* get_treeByIdMedVal();
     AvlTree<int, Contestant>* get_treeByIdSmallVal();

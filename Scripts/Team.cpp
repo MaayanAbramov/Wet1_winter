@@ -5,14 +5,16 @@
 #include "Team.h"
 
 Team::~Team() {
-    delete team_whole_contestants; //destructorOfAvlTree?
+    delete team_whole_contestants_by_id; //destructorOfAvlTree?
+    delete team_whole_contestants_by_strength;
     delete treeByIdBigVal;
     delete treeByIdMedVal;
     delete treeByIdSmallVal;
     delete treeByStrengthBigVal;
     delete treeByStrengthMedVal;
     delete treeByStrengthSmallVal;
-    team_whole_contestants = nullptr; //destructorOfAvlTree?
+    team_whole_contestants_by_id = nullptr; //destructorOfAvlTree?
+    team_whole_contestants_by_strength = nullptr;
     treeByIdBigVal = nullptr;
     treeByIdMedVal = nullptr;
     treeByIdSmallVal = nullptr;
@@ -29,7 +31,8 @@ Team::Team() {
     for (int i = 0 ; i < 3 ; i++) {
         this->stateOfBalance[i] = 0;
     }
-    this->team_whole_contestants = new AvlTree<int, Contestant>();
+    this->team_whole_contestants_by_id = new AvlTree<int, Contestant>();
+    this->team_whole_contestants_by_strength = new AvlTree<int, Contestant>();
     this->treeByIdBigVal = new AvlTree<int, Contestant>();
     this->treeByIdMedVal = new AvlTree<int, Contestant>();
     this->treeByIdSmallVal = new AvlTree<int, Contestant>();
@@ -47,6 +50,7 @@ Team::Team() {
     this->maxInTreeByStrengthSmallVal = 0;
     this->maxInTreeByStrengthMedVal = 0;
     this->maxInTreeByStrengthBigVal = 0;
+    optimalTeamStrength = 0;
 
 
 }
@@ -56,7 +60,8 @@ Team::Team(int teamId, Sport sport, int numParticipants, int countryId) {
     this->sport = sport;
     this->numParticipants = numParticipants;
     this->myCountry = countryId;
-    this->team_whole_contestants = new AvlTree<int, Contestant>();
+    this->team_whole_contestants_by_id = new AvlTree<int, Contestant>();
+    this->team_whole_contestants_by_strength = new AvlTree<int, Contestant>();
     this->treeByIdBigVal = new AvlTree<int, Contestant>();
     this->treeByIdMedVal = new AvlTree<int, Contestant>();
     this->treeByIdSmallVal = new AvlTree<int, Contestant>();
@@ -78,7 +83,7 @@ Team::Team(int teamId, Sport sport, int numParticipants, int countryId) {
     this->maxInTreeByStrengthSmallVal = 0;
     this->maxInTreeByStrengthMedVal = 0;
     this->maxInTreeByStrengthBigVal = 0;
-
+    optimalTeamStrength = 0;
 
 }
 
@@ -96,6 +101,12 @@ int Team::get_maxInTreeByStrengthSmallVal() {
 }
 int Team::getStateOfBalance(int index) {
     return stateOfBalance[index];
+}
+int Team::get_optimalTeamStrength() const {
+    return optimalTeamStrength;
+}
+void Team::set_optimalTeamStrength(int optimalVal) {
+    this->optimalTeamStrength = optimalVal;
 }
 AvlTree<int, Contestant>* Team::get_treeByIdBigVal() {
     return this->treeByIdBigVal;
@@ -345,13 +356,14 @@ void Team::updateTreeByStrengthBigVal() { //need to be here an update to the min
     this->minInTreeByIdBigVal = (this->treeByIdBigVal->findMin(treeByIdBigVal->root))->key;
     updateStateOfBalance();
 }
-/*
+
 void Team::addContestantToATeam(int contestantId, int countryId, int strength, Sport sport) {
     //Please Notice this one is added to the trees by strength
     Contestant toAdd = Contestant(contestantId, countryId, strength, sport, true);
     //Please notice this one is added to the trees by Id
     Contestant toAddId = Contestant(contestantId, countryId, strength, sport, false);
-    team_whole_contestants->insertAux(contestantId, toAddId); //important for austerity_measures
+    team_whole_contestants_by_id->insertAux(contestantId, toAddId); //important for austerity_measures
+    team_whole_contestants_by_strength->insertAux(toAdd.get_strength(), toAdd);
     if (treeByIdSmallVal->numOfNodes == 0 && treeByIdMedVal->numOfNodes == 0 &&
         treeByIdBigVal->numOfNodes == 0) {
         treeByStrengthSmallVal->insertAux(strength, toAdd); //One Tree is the mirror of the other tree
@@ -372,75 +384,16 @@ void Team::addContestantToATeam(int contestantId, int countryId, int strength, S
             updateTreeByStrengthSmallVal();
         }
     }
-    else if (this->maxInTreeByIdSmallVal <= contestantId &&
-             minInTreeByIdMedVal >= contestantId) {
-        if (treeByIdMedVal->numOfNodes >= treeByIdSmallVal->numOfNodes) {
-            if (stateOfBalance[0] < 1) {
-                this->treeByStrengthSmallVal->insertAux(strength, toAdd);
-                this->treeByIdSmallVal->insertAux(contestantId, toAddId);
-                updateTreeByStrengthSmallVal();
-            }
-            else {
-                makePlaceInTreeByIdSmallVal();
-                this->treeByStrengthSmallVal->insertAux(strength, toAdd);
-                this->treeByIdSmallVal->insertAux(contestantId, toAddId);
-                updateTreeByStrengthSmallVal();
-            }
-        }
-        else {
-            if (stateOfBalance[1] < 1) {
-                this->treeByStrengthMedVal->insertAux(strength, toAdd);
-                this->treeByIdMedVal->insertAux(contestantId, toAddId);
-                updateTreeByStrengthMedVal();
-            }
-            else {
-                makePlaceInTreeByIdMedVal();
-                this->treeByStrengthMedVal->insertAux(strength, toAdd);
-                this->treeByIdMedVal->insertAux(contestantId, toAddId);
-                updateTreeByStrengthMedVal();
-            }
-        }
-    }
-    else if (minInTreeByIdMedVal <= contestantId && contestantId <= maxInTreeByIdMedVal) {
+    else if (contestantId < maxInTreeByIdMedVal) {
         if (stateOfBalance[1] < 1) {
             this->treeByStrengthMedVal->insertAux(strength, toAdd);
             this->treeByIdMedVal->insertAux(contestantId, toAddId);
             updateTreeByStrengthMedVal();
-        }
-        else {
+        } else {
             makePlaceInTreeByIdMedVal();
             this->treeByStrengthMedVal->insertAux(strength, toAdd);
             this->treeByIdMedVal->insertAux(contestantId, toAddId);
             updateTreeByStrengthMedVal();
-
-        }
-    }
-    else if ( maxInTreeByIdMedVal <= contestantId  && contestantId <= minInTreeByIdBigVal) {
-        if (treeByIdMedVal->numOfNodes >= treeByIdBigVal->numOfNodes) {
-            if (stateOfBalance[2] < 1) {
-                this->treeByStrengthBigVal->insertAux(strength, toAdd);
-                this->treeByIdBigVal->insertAux(contestantId, toAddId);
-                updateTreeByStrengthBigVal();
-            }
-            else {
-                makePlaceInTreeByIdBigVal();
-                this->treeByStrengthBigVal->insertAux(strength, toAdd);
-                this->treeByIdBigVal->insertAux(contestantId, toAddId);
-                updateTreeByStrengthBigVal();
-            }
-        }
-        else {
-            if (stateOfBalance[1] < 1) {
-                this->treeByStrengthMedVal->insertAux(strength, toAdd);
-                this->treeByIdMedVal->insertAux(contestantId, toAddId);
-                updateTreeByStrengthBigVal();
-            }
-            else {
-                makePlaceInTreeByIdBigVal();
-                this->treeByStrengthBigVal->insertAux(strength, toAdd);
-                this->treeByIdBigVal->insertAux(contestantId, toAddId);
-                updateTreeByStrengthBigVal();
-            }
         }
     }
     else { //which only left the case where strength is bigger that maxInTreeByStrengthBigVal
@@ -455,6 +408,19 @@ void Team::addContestantToATeam(int contestantId, int countryId, int strength, S
             this->treeByIdBigVal->insertAux(contestantId, toAddId);
             updateTreeByStrengthBigVal();
 
+        }
+    }
+}
+/*
+void Team::updateOptimalTeamStrength() {
+    if (team_whole_contestants_by_id->numOfNodes == 0) {
+        optimalTeamStrength = 0;
+    } else {
+        int counter = 0;
+        auto minNodeToDelete = team_whole_contestants_by_strength->findMin
+                    (team_whole_contestants_by_strength->root);
+        Contestant copyOfFirstDeleted = *(minNodeToDelete->getValue());
+        counter++;
         }
     }
 }*/
