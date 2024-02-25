@@ -14,7 +14,7 @@ class Team {
     Sport sport;
     int numParticipants;
     int myCountry;
-    AvlTree<int, Contestant>* teamContestants;
+    AvlTree<int, Contestant>* team_whole_contestants;
 
 
     AvlTree<int, Contestant>* treeByIdBigVal;
@@ -39,18 +39,18 @@ class Team {
 public:
     Team();
     Team(int teamId, Sport sport, int numParticipants, int countryId);
-    ~Team() = default;
+    ~Team();
     int getCountryId() const;
     int getStateOfBalance(int index);
     void updateStateOfBalance();
-    /*void makePlaceInTreeByIdBigVal();
-    void makePlaceInTreeByIdMedVal();*/
+    void makePlaceInTreeByIdBigVal();
+    void makePlaceInTreeByIdMedVal();
     void makePlaceInTreeByIdSmallVal();
 
     void updateTreeByStrengthSmallVal(); //notice : name not correct!. this one updates both of small trees
     void updateTreeByStrengthMedVal();//notice : name not correct!. this one updates both of med trees
     void updateTreeByStrengthBigVal(); //notice : name not correct!. this one updates both of big trees
-    //void addContestant(int contestantId, int countryId, int strength, Sport sport);
+    //void addContestantToATeam(int contestantId, int countryId, int strength, Sport sport);
     // about the Contestant
     int get_maxInTreeByStrengthBigVal();
     int get_maxInTreeByStrengthMedVal();

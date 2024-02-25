@@ -9,29 +9,32 @@ int main() {
     Team team = Team(1, Sport::ACROBATICS, 0, 123); // Example values for teamId, sport, numParticipants, and countryId
     team.updateStateOfBalance();
 
-    Contestant num1 = Contestant(2, 0, 1, Sport::ACROBATICS, false);
-    team.get_treeByIdSmallVal()->insertAux(2, num1);
-    num1.set_is_by_strength_sorted(true);
-    team.get_treeByStrengthSmallVal()->insertAux(1, num1);
-    // Update the state of balance
-    team.updateTreeByStrengthSmallVal();
 
-    Contestant num2 = Contestant(5, 0, 7, Sport::ACROBATICS, false);
-    team.get_treeByIdMedVal()->insertAux(5, num2);
+    Contestant num2 = Contestant(7, 0, 4, Sport::ACROBATICS, false);
+    team.get_treeByIdMedVal()->insertAux(num2.get_contestantId(), num2);
     num2.set_is_by_strength_sorted(true);
-    team.get_treeByStrengthMedVal()->insertAux(7, num2);
+    team.get_treeByStrengthMedVal()->insertAux(num2.get_strength(), num2);
     // Update the state of balance
     team.updateTreeByStrengthMedVal();
 
+    Contestant num3 = Contestant(11, 0, 7, Sport::ACROBATICS, false);
+    team.get_treeByIdBigVal()->insertAux(num3.get_contestantId(), num3);
+    num3.set_is_by_strength_sorted(true);
+    team.get_treeByStrengthBigVal()->insertAux(num3.get_strength(), num3);
+    // Update the state of balance
+    team.updateTreeByStrengthBigVal();
 
     for (int i = 0 ; i < 3 ; i++) {
         cout << "#updateStateOfBalance " << team.getStateOfBalance(i) <<endl;
     }
     cout << "------------------------------------" << endl;
-    team.makePlaceInTreeByIdSmallVal();
+    team.makePlaceInTreeByIdBigVal();
     for (int i = 0 ; i < 3 ; i++) {
         cout << "#updateStateOfBalance " << team.getStateOfBalance(i) <<endl;
     }
     cout << "------------------------------------" << endl;
+
+
+
     return 0;
 }
