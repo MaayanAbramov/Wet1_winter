@@ -27,6 +27,14 @@ class Team {
     AvlTree<int, Contestant>* treeByStrengthMedVal;
     AvlTree<int, Contestant>* treeByStrengthSmallVal;
     int stateOfBalance[3];
+    Contestant* contestantWithMaxInTreeByIdBigVal;
+    Contestant* contestantWithMaxInTreeByIdMedVal;
+    Contestant* contestantWithMaxInTreeByIdSmallVal;
+
+    Contestant* contestantWithMinInTreeByIdBigVal;
+    Contestant* contestantWithMinInTreeByIdMedVal;
+    Contestant* contestantWithMinInTreeByIdSmallVal;
+
     int maxInTreeByIdBigVal;
     int maxInTreeByIdMedVal;
     int maxInTreeByIdSmallVal;

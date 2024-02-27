@@ -15,14 +15,14 @@ int main() {
     team->addContestantToATeam(13, 0, 6, Sport::ACROBATICS);
     team->addContestantToATeam(15, 0, 9, Sport::ACROBATICS);
     team->addContestantToATeam(7, 0, 2, Sport::ACROBATICS);
-    team->addContestantToATeam(12, 0, 5, Sport::ACROBATICS);
-    team->addContestantToATeam(14, 0, 0, Sport::ACROBATICS);
-    team->addContestantToATeam(6, 0, 6, Sport::ACROBATICS);
-    team->addContestantToATeam(10, 0, 3, Sport::ACROBATICS);
+    team->addContestantToATeam(3, 0, 2, Sport::ACROBATICS);
+    team->addContestantToATeam(1, 0, 2, Sport::ACROBATICS);
+    team->addContestantToATeam(0, 0, 2, Sport::ACROBATICS);
+    /*team->addContestantToATeam(10, 0, 3, Sport::ACROBATICS);
     team->addContestantToATeam(9, 0, 7, Sport::ACROBATICS);
     team->addContestantToATeam(11, 0, 7, Sport::ACROBATICS);
     team->addContestantToATeam(16, 0, 14, Sport::ACROBATICS);
-    team->addContestantToATeam(18, 0, 4, Sport::ACROBATICS);
+    team->addContestantToATeam(18, 0, 4, Sport::ACROBATICS);*/
 
     for (int i = 0 ; i < 3 ; i++) {
         cout << "#updateStateOfBalance " << team->getStateOfBalance(i) <<endl;
