@@ -31,35 +31,42 @@ Contestant::Contestant(const Contestant& other) {
     this->is_by_strength_sorted = other.is_by_strength_sorted;
 }
 bool Contestant::operator==(const Contestant& other) const {
-    if (this->is_by_strength_sorted) {
-        return (this->strength == other.strength) && (this->contestantId == other.contestantId);
-    }
-    return this->contestantId == other.contestantId;
+    assert(false);
+//    shouldnt compare herer
+//    if (this->is_by_strength_sorted) {
+//        return (this->strength == other.strength) && (this->contestantId == other.contestantId);
+//    }
+//    return this->contestantId == other.contestantId;
 }
 
 bool operator<(const Contestant& num1, const Contestant& num2) {
-    if (num1.is_by_strength_sorted) {
-        bool OK1 = num1.strength < num2.strength;
-        bool OK2 = ((num1.strength == num2.strength) && (num1.contestantId < num2
-                .contestantId));
-        return  OK1 || OK2;
-
-    }
-    assert(num1.is_by_strength_sorted != -1);
-    bool OK3 = num1.contestantId < num2.contestantId;
-    return OK3;
+    assert(false);
+    //shouldn't compare here.
+//    if (num1.is_by_strength_sorted) {
+//        bool OK1 = num1.strength < num2.strength;
+//        bool OK2 = ((num1.strength == num2.strength) && (num1.contestantId < num2
+//                .contestantId));
+//        return  OK1 || OK2;
+//
+//    }
+//
+//    assert(num1.is_by_strength_sorted != -1);
+//    bool OK3 = num1.contestantId < num2.contestantId;
+//    return OK3;
 }
 
 
 bool operator>(const Contestant& num1, const Contestant& num2) {
-    if (num1.is_by_strength_sorted) {
-        bool OK1 = num1.strength > num2.strength;
-        bool OK2 = ((num1.strength == num2.strength) && (num1.contestantId > num2.contestantId));
-        return OK1 || OK2;
-    }
-    assert(num1.is_by_strength_sorted != -1);
-    bool OK3 = num1.contestantId > num2.contestantId;
-    return OK3;
+    assert(false);
+    //shouldn't compare here
+//    if (num1.is_by_strength_sorted) {
+//        bool OK1 = num1.strength > num2.strength;
+//        bool OK2 = ((num1.strength == num2.strength) && (num1.contestantId > num2.contestantId));
+//        return OK1 || OK2;
+//    }
+//    assert(num1.is_by_strength_sorted != -1);
+//    bool OK3 = num1.contestantId > num2.contestantId;
+//    return OK3;
 }
 
 int Contestant::get_contestantId() const {

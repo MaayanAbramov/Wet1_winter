@@ -57,14 +57,14 @@ public:
     void deleteLeaf(Node* leafToRemove);
     void updateNodesTillRoot(Node* curr_node);
 
-    void deleteNodeIfHasOneSon(const Value& valToDelete, Node* curr_node); //connects between the grandpa and the son
-    void deleteNodeIfHasTwoSons(Value* valToDelete, Node* curr_node);//check that you actually update the BF and
+    void deleteNodeIfHasOneSon(const Key& keyToDelete, Node* curr_node); //connects between the grandpa and the son
+    void deleteNodeIfHasTwoSons(Key* keyToDelete, Node* curr_node);//check that you actually update the BF and
     // height //
     // from
     // the swapped till the root
-    Node* findNextNodeInOrder(const Value& val);
+    Node* findNextNodeInOrder(const Key& key);
     Node* swapNodes(Node* toDelete, Node* NextInorder);
-    void remove(const Value& valToRemove); //should check before calling if numOfNodes == 0 then return failure, there
+    void remove(const Key& keyToRemove); //should check before calling if numOfNodes == 0 then return failure, there
     // shouldnt be a call if numOfNodes == 0
     //returns null in the case of not finding the key
     //returns the root in the success case
@@ -91,7 +91,7 @@ public:
     AvlTree& operator=(const AvlTree& other) = delete;
 
 
-    Node* find(const Value& val, Node* curr_node) const;
+    Node* find(const Key& key, Node* curr_node) const;
     Node* findMax(Node* curr_node);
     Node* findMin(Node* curr_node);
     static int heightDetermination(Node* node);
@@ -176,11 +176,11 @@ void AvlTree<Key, Value>::updateNodesTillRoot(Node* curr_node) {
 }
 
 template <class Key, class Value>
-typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::find(const Value& val, Node* curr_node) const {
-    if (curr_node == nullptr || *(curr_node->getValue()) == val) {
+typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::find(const Key& key, Node* curr_node) const {
+    if (curr_node == nullptr || *(curr_node->getKey()) == key) {
         return curr_node;
     }
-    return ( val < *(curr_node->getValue())) ? find(val, curr_node->left) : find(val, curr_node->right);
+    return (key < *(curr_node->getKey())) ? find(key, curr_node->left) : find(key, curr_node->right);
 }
 
 template <class Key, class Value>
@@ -372,11 +372,10 @@ void AvlTree<Key, Value>::insertAux(const Key& key, const Value& value) {
 template <class Key, class Value>
 void AvlTree<Key, Value>::recursive_insert(Node* curr_node, const Key& key, const
 Value& value, bool* createdAlready) {
-    if ( *(curr_node->getValue()) == value && !*createdAlready) {
+    if (*(curr_node->getKey()) == key && !*createdAlready) {
         throw invalid_argument("the key already exists");
     }
-    if (value < *(curr_node->getValue()) && curr_node->left == nullptr) { //always
-        // think about the case where the strength are the same (keys the same, but the contestantId no)
+    if (key < *(curr_node->getKey()) && curr_node->left == nullptr) {
         numOfNodes++;
         //Value* valueToInsert = new Value(value)
         curr_node->left = new Node(key, value);
@@ -384,16 +383,16 @@ Value& value, bool* createdAlready) {
         updateFieldsAfterChangeInTree(curr_node->left);
         *createdAlready = true;
     }
-    if ( value > (*(curr_node->getValue())) && curr_node->right == nullptr) {
+    if (key > *(curr_node->getKey()) && curr_node->right == nullptr) {
         numOfNodes++;
         curr_node->right = new Node(key, value);
         curr_node->right->father = curr_node;
         updateFieldsAfterChangeInTree(curr_node->right);
         *createdAlready = true;
     }
-    if (value > *(curr_node->getValue()) && !(*createdAlready)) {
+    if (key > *(curr_node->getKey()) && !(*createdAlready)) {
         recursive_insert(curr_node->right, key, value, createdAlready);
-    } else if (value < *(curr_node->getValue()) && !(*createdAlready)) {
+    } else if (key < *(curr_node->getKey()) && !(*createdAlready)) {
         recursive_insert(curr_node->left, key, value, createdAlready);
     }
     updateFieldsAfterChangeInTree(curr_node);
@@ -403,14 +402,14 @@ Value& value, bool* createdAlready) {
 
 
 template <class Key, class Value>
-void AvlTree<Key, Value>::remove(const Value& valToRemove) { //help functions should be recursive, to
+void AvlTree<Key, Value>::remove(const Key& keyToRemove) { //help functions should be recursive, to
     // update the route
     // till the root
-    Value copy = valToRemove;
+    Key copy = keyToRemove;
     if (root == nullptr) {
         throw invalid_argument("The key is empty");
     }
-    Node* toRemove = find(valToRemove, root);
+    Node* toRemove = find(keyToRemove, root);
     if (toRemove == nullptr) {
         throw invalid_argument("The key does not exist");
     }
@@ -422,16 +421,16 @@ void AvlTree<Key, Value>::remove(const Value& valToRemove) { //help functions sh
         deleteTrivialTree();
     }
     else if (toRemove->left == nullptr || toRemove->right == nullptr) {
-        deleteNodeIfHasOneSon(*(toRemove->getValue()), root);
+        deleteNodeIfHasOneSon(*(toRemove->getKey()), root);
     }
     else {
         deleteNodeIfHasTwoSons(&copy, root);
     }
 }
 template <class Key, class Value>
-void AvlTree<Key, Value>::deleteNodeIfHasOneSon(const Value& valToDelete, Node* curr_node) { //may be need update till
+void AvlTree<Key, Value>::deleteNodeIfHasOneSon(const Key& keyToDelete, Node* curr_node) { //may be need update till
     // the root, even thought it looks like not because height of subtree of root changes only in 1
-    Node* toRemove = find(valToDelete, root); //the callee already deals with not found case
+    Node* toRemove = find(keyToDelete, root); //the callee already deals with not found case
     Node* fatherInLaw = toRemove->father;
     if (toRemove == root) {
         deleteParentOfOneBrotherOnly();
@@ -476,11 +475,11 @@ void AvlTree<Key, Value>::deleteNodeIfHasOneSon(const Value& valToDelete, Node* 
 }
 
 template <class Key, class Value>
-typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::findNextNodeInOrder(const Value& val) {
+typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::findNextNodeInOrder(const Key& key) {
     Node* successor = nullptr;
     Node* temp = root;
     while (temp) {
-        if (!(val < *(temp->getValue()))) {
+        if (key >= *(temp->getKey())) {
             temp = temp->right;
         }
         else {
@@ -492,9 +491,9 @@ typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::findNextNodeInOrder(con
 }
 
 template <class Key, class Value>
-void AvlTree<Key, Value>::deleteNodeIfHasTwoSons(Value* valToDelete, Node* curr_node) {
-    if (*(curr_node->getValue()) == *valToDelete) {
-        Node* successor = findNextNodeInOrder(*valToDelete); //successor has to be a leaf or to have one son only
+void AvlTree<Key, Value>::deleteNodeIfHasTwoSons(Key* keyToDelete, Node* curr_node) {
+    if (*(curr_node->getKey()) == *keyToDelete) {
+        Node* successor = findNextNodeInOrder(*keyToDelete); //successor has to be a leaf or to have one son only
         //cout << "the successor of 3 is --------------------" << successor->key << endl;
         //cout << "before swap" << endl;
         //printTreeWithInfo(root, 0, '-');
@@ -505,7 +504,7 @@ void AvlTree<Key, Value>::deleteNodeIfHasTwoSons(Value* valToDelete, Node* curr_
         updateFieldsAfterChangeInTree(curr_node);
         //rotate(successor);
         //rotate(curr_node);
-        *valToDelete = *(successor->getValue());
+        *keyToDelete = *(successor->getKey());
         if (successor->left == nullptr && successor->right == nullptr) {
             deleteLeaf(successor);
             return;
@@ -541,11 +540,11 @@ void AvlTree<Key, Value>::deleteNodeIfHasTwoSons(Value* valToDelete, Node* curr_
         // don't think can be an option for (successor->right == nullptr)
         return;
     }
-    if (*(curr_node->getValue()) < *valToDelete) {
-        deleteNodeIfHasTwoSons(valToDelete, curr_node->right);
+    if (*(curr_node->getKey()) < *keyToDelete) {
+        deleteNodeIfHasTwoSons(keyToDelete, curr_node->right);
     }
-    if(*(curr_node->getValue()) > *valToDelete) {
-        deleteNodeIfHasTwoSons(valToDelete, curr_node->left);
+    if(*(curr_node->getKey()) > *keyToDelete) {
+        deleteNodeIfHasTwoSons(keyToDelete, curr_node->left);
     }
     updateFieldsAfterChangeInTree(curr_node);
     rotate(curr_node);

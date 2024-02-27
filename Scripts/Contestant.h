@@ -13,7 +13,39 @@
 #include "wet1util.h"
 #define TEAM_TYPE_INIT 5
 
+class Contestant_Key{
+public:
+    int id;
+    int strength;
+    bool by_strength= false;
 
+    explicit Contestant_Key(int id=-1,int strength=-1,bool by_strength=false): id(id),strength(strength),by_strength
+    (by_strength){
+        assert(this->id!=-1);
+        assert(this->strength!=-1);
+    }
+    Contestant_Key(const Contestant_Key& key) =default;
+    ~Contestant_Key()=default;
+    friend bool operator<(const Contestant_Key& key1, const Contestant_Key& key2){
+        assert(key1.by_strength == key2.by_strength);
+        if (key1.by_strength==false){
+            return key1.id<key2.id;
+        }
+        else {
+            return key1.strength<key2.strength? true: key1.strength==key2.strength && key1.id < key2.id;
+        }
+    }
+    bool operator==(const Contestant_Key& key2){
+        assert(this->by_strength == key2.by_strength);
+        if (this->by_strength==false){
+            return this->id == key2.id;
+        }
+        else {
+            return this->strength == key2.strength && this->id == key2.id;
+        }
+    }
+
+};
 class Contestant {
     int contestantId;
     int countryId;

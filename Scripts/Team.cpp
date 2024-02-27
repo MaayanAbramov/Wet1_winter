@@ -36,17 +36,19 @@ Team::Team() {
     this->sport = static_cast<Sport>(TEAM_TYPE_INIT); //only for initialization
     this->myCountry = 0;
     for (int i = 0 ; i < 3 ; i++) {
-        this->stateOfBalance[i] = 0;
+        this->stateOfBalanceForAdd[i] = 0;
     }
-
-    this->team_whole_contestants_by_id = new AvlTree<int, Contestant>();
-    this->team_whole_contestants_by_strength = new AvlTree<int, Contestant>();
-    this->treeByIdBigVal = new AvlTree<int, Contestant>();
-    this->treeByIdMedVal = new AvlTree<int, Contestant>();
-    this->treeByIdSmallVal = new AvlTree<int, Contestant>();
-    this->treeByStrengthBigVal = new AvlTree<int, Contestant>();
-    this->treeByStrengthMedVal = new AvlTree<int, Contestant>();
-    this->treeByStrengthSmallVal = new AvlTree<int, Contestant>();
+    for (int i = 0 ; i < 3 ; i++) {
+        this->stateOfBalanceForRemove[i] = 0;
+    }
+    this->team_whole_contestants_by_id = new AvlTree<Contestant_Key, Contestant>();
+    this->team_whole_contestants_by_strength = new AvlTree<Contestant_Key, Contestant>();
+    this->treeByIdBigVal = new AvlTree<Contestant_Key, Contestant>();
+    this->treeByIdMedVal = new AvlTree<Contestant_Key, Contestant>();
+    this->treeByIdSmallVal = new AvlTree<Contestant_Key, Contestant>();
+    this->treeByStrengthBigVal = new AvlTree<Contestant_Key, Contestant>();
+    this->treeByStrengthMedVal = new AvlTree<Contestant_Key, Contestant>();
+    this->treeByStrengthSmallVal = new AvlTree<Contestant_Key, Contestant>();
 
     this->contestantWithMaxInTreeByIdBigVal = new Contestant(0, 0, 0, Sport::SPINNING,0);
     this->contestantWithMaxInTreeByIdMedVal= new Contestant(0, 0, 0, Sport::SPINNING,0);
@@ -55,17 +57,16 @@ Team::Team() {
     this->contestantWithMinInTreeByIdMedVal= new Contestant(0, 0, 0, Sport::SPINNING,0);
     this->contestantWithMinInTreeByIdSmallVal= new Contestant(0, 0, 0, Sport::SPINNING,0);
 
-    this->maxInTreeByIdBigVal = 0;
-    this->maxInTreeByIdMedVal = 0;
-    this->maxInTreeByIdSmallVal = 0;
-    this->minInTreeByIdBigVal = 0;
-    this->minInTreeByIdMedVal = 0;
-    this->minInTreeByIdSmallVal = 0;
-
-    this->maxInTreeByStrengthSmallVal = 0;
-    this->maxInTreeByStrengthMedVal = 0;
-    this->maxInTreeByStrengthBigVal = 0;
-    optimalTeamStrength = 0;
+    this->maxInTreeByIdBigVal = Contestant_Key(0,0,false);
+    this->maxInTreeByIdMedVal = Contestant_Key(0,0,false);
+    this->maxInTreeByIdSmallVal = Contestant_Key(0,0,false);
+    this->minInTreeByIdBigVal = Contestant_Key(0,0,false);
+    this->minInTreeByIdMedVal = Contestant_Key(0,0,false);
+    this->minInTreeByIdSmallVal = Contestant_Key(0,0,false);
+    this->maxInTreeByStrengthSmallVal =Contestant_Key(0,0,true);
+    this->maxInTreeByStrengthMedVal = Contestant_Key(0,0,true);
+    this->maxInTreeByStrengthBigVal = Contestant_Key(0,0,true);
+    this->optimalTeamStrength = 0;
 
 
 }
@@ -75,17 +76,22 @@ Team::Team(int teamId, Sport sport, int numParticipants, int countryId) {
     this->sport = sport;
     this->numParticipants = numParticipants;
     this->myCountry = countryId;
-    this->team_whole_contestants_by_id = new AvlTree<int, Contestant>();
-    this->team_whole_contestants_by_strength = new AvlTree<int, Contestant>();
-    this->treeByIdBigVal = new AvlTree<int, Contestant>();
-    this->treeByIdMedVal = new AvlTree<int, Contestant>();
-    this->treeByIdSmallVal = new AvlTree<int, Contestant>();
-    this->treeByStrengthBigVal = new AvlTree<int, Contestant>();
-    this->treeByStrengthMedVal = new AvlTree<int, Contestant>();
-    this->treeByStrengthSmallVal = new AvlTree<int, Contestant>();
+    this->team_whole_contestants_by_id = new AvlTree<Contestant_Key, Contestant>();
+    this->team_whole_contestants_by_strength = new AvlTree<Contestant_Key, Contestant>();
+    this->treeByIdBigVal = new AvlTree<Contestant_Key, Contestant>();
+    this->treeByIdMedVal = new AvlTree<Contestant_Key, Contestant>();
+    this->treeByIdSmallVal = new AvlTree<Contestant_Key, Contestant>();
+    this->treeByStrengthBigVal = new AvlTree<Contestant_Key, Contestant>();
+    this->treeByStrengthMedVal = new AvlTree<Contestant_Key, Contestant>();
+    this->treeByStrengthSmallVal = new AvlTree<Contestant_Key, Contestant>();
     if (numParticipants == 0) {
         for (int i = 0 ; i < 3 ; i++) {
-            stateOfBalance[i] = 0;
+            stateOfBalanceForAdd[i] = 0;
+        }
+    }
+    if (numParticipants == 0) {
+        for (int i = 0 ; i < 3 ; i++) {
+            stateOfBalanceForRemove[i] = 0;
         }
     }
     this->contestantWithMaxInTreeByIdBigVal = new Contestant(0, 0, 0, Sport::SPINNING,0);
@@ -95,16 +101,16 @@ Team::Team(int teamId, Sport sport, int numParticipants, int countryId) {
     this->contestantWithMinInTreeByIdMedVal= new Contestant(0, 0, 0, Sport::SPINNING,0);
     this->contestantWithMinInTreeByIdSmallVal= new Contestant(0, 0, 0, Sport::SPINNING,0);
 
-    this->maxInTreeByIdBigVal = 0;
-    this->maxInTreeByIdMedVal = 0;
-    this->maxInTreeByIdSmallVal = 0;
-    this->minInTreeByIdBigVal = 0;
-    this->minInTreeByIdMedVal = 0;
-    this->minInTreeByIdSmallVal = 0;
+    this->maxInTreeByIdBigVal = Contestant_Key(0,0,false);
+    this->maxInTreeByIdMedVal = Contestant_Key(0,0,false);
+    this->maxInTreeByIdSmallVal = Contestant_Key(0,0,false);
+    this->minInTreeByIdBigVal = Contestant_Key(0,0,false);
+    this->minInTreeByIdMedVal = Contestant_Key(0,0,false);
+    this->minInTreeByIdSmallVal = Contestant_Key(0,0,false);
 
-    this->maxInTreeByStrengthSmallVal = 0;
-    this->maxInTreeByStrengthMedVal = 0;
-    this->maxInTreeByStrengthBigVal = 0;
+    this->maxInTreeByStrengthSmallVal = Contestant_Key(0,0,true);
+    this->maxInTreeByStrengthMedVal = Contestant_Key(0,0,true);
+    this->maxInTreeByStrengthBigVal = Contestant_Key(0,0,true);
     optimalTeamStrength = 0;
 
 }
@@ -112,17 +118,17 @@ Team::Team(int teamId, Sport sport, int numParticipants, int countryId) {
 int Team::getCountryId() const{
     return this->myCountry;
 }
-int Team::get_maxInTreeByStrengthBigVal() {
+Contestant_Key Team::get_maxInTreeByStrengthBigVal() {
     return maxInTreeByStrengthBigVal;
 }
-int Team::get_maxInTreeByStrengthMedVal() {
+Contestant_Key Team::get_maxInTreeByStrengthMedVal() {
     return maxInTreeByStrengthMedVal;
 }
-int Team::get_maxInTreeByStrengthSmallVal() {
+Contestant_Key Team::get_maxInTreeByStrengthSmallVal() {
     return maxInTreeByStrengthSmallVal;
 }
-int Team::getStateOfBalance(int index) {
-    return stateOfBalance[index];
+int Team::getStateOfBalanceForAdd(int index) {
+    return stateOfBalanceForAdd[index];
 }
 int Team::get_optimalTeamStrength() const {
     return optimalTeamStrength;
@@ -130,195 +136,192 @@ int Team::get_optimalTeamStrength() const {
 void Team::set_optimalTeamStrength(int optimalVal) {
     this->optimalTeamStrength = optimalVal;
 }
-AvlTree<int, Contestant>* Team::get_treeByIdBigVal() {
+AvlTree<Contestant_Key, Contestant>* Team::get_treeByIdBigVal() {
     return this->treeByIdBigVal;
 }
-AvlTree<int, Contestant>* Team::get_treeByIdMedVal() {
+AvlTree<Contestant_Key, Contestant>* Team::get_treeByIdMedVal() {
     return this->treeByIdMedVal;
 }
-AvlTree<int, Contestant>* Team::get_treeByIdSmallVal() {
+AvlTree<Contestant_Key, Contestant>* Team::get_treeByIdSmallVal() {
     return this->treeByIdSmallVal;
 }
 
 
-AvlTree<int, Contestant>* Team::get_treeByStrengthBigVal() {
+AvlTree<Contestant_Key, Contestant>* Team::get_treeByStrengthBigVal() {
     return this->treeByStrengthBigVal;
 }
-AvlTree<int, Contestant>* Team::get_treeByStrengthMedVal() {
+AvlTree<Contestant_Key, Contestant>* Team::get_treeByStrengthMedVal() {
     return this->treeByStrengthMedVal;
 }
-AvlTree<int, Contestant>* Team::get_treeByStrengthSmallVal() {
+AvlTree<Contestant_Key, Contestant>* Team::get_treeByStrengthSmallVal() {
     return this->treeByStrengthSmallVal;
 }
 
-void Team::updateStateOfBalance() {
+void Team::updateStateOfBalanceForAdd() {
     int numSmall = treeByIdSmallVal->numOfNodes;
     int numMed = treeByIdMedVal->numOfNodes;
     int numBig = treeByIdBigVal->numOfNodes;
     if (treeByIdSmallVal->numOfNodes - treeByIdMedVal->numOfNodes >= treeByIdSmallVal->numOfNodes -
                                                                      treeByIdBigVal->numOfNodes)
-        stateOfBalance[0] = treeByIdSmallVal->numOfNodes - treeByIdMedVal->numOfNodes;
+        stateOfBalanceForAdd[0] = treeByIdSmallVal->numOfNodes - treeByIdMedVal->numOfNodes;
     else {
-        stateOfBalance[0] = treeByIdSmallVal->numOfNodes - treeByIdBigVal->numOfNodes;
+        stateOfBalanceForAdd[0] = treeByIdSmallVal->numOfNodes - treeByIdBigVal->numOfNodes;
     }
     if (treeByIdMedVal->numOfNodes - treeByIdSmallVal->numOfNodes >= treeByIdMedVal->numOfNodes -
                                                                      treeByIdBigVal->numOfNodes) {
-        stateOfBalance[1] = treeByIdMedVal->numOfNodes - treeByIdSmallVal->numOfNodes;
+        stateOfBalanceForAdd[1] = treeByIdMedVal->numOfNodes - treeByIdSmallVal->numOfNodes;
     }
     else {
-        stateOfBalance[1] = treeByIdMedVal->numOfNodes - treeByIdBigVal->numOfNodes;
+        stateOfBalanceForAdd[1] = treeByIdMedVal->numOfNodes - treeByIdBigVal->numOfNodes;
     }
     if (treeByIdBigVal->numOfNodes - treeByIdSmallVal->numOfNodes >= treeByIdBigVal->numOfNodes -
                                                                      treeByIdMedVal->numOfNodes) {
-        stateOfBalance[2] = treeByIdBigVal->numOfNodes - treeByIdSmallVal->numOfNodes;
+        stateOfBalanceForAdd[2] = treeByIdBigVal->numOfNodes - treeByIdSmallVal->numOfNodes;
     }
     else {
-        stateOfBalance[2] = treeByIdBigVal->numOfNodes - treeByIdMedVal->numOfNodes;
+        stateOfBalanceForAdd[2] = treeByIdBigVal->numOfNodes - treeByIdMedVal->numOfNodes;
     }
     return;
 }
 
-void Team::makePlaceInTreeByIdBigVal() {
-    if (stateOfBalance[1] != 1) {
+void Team::makePlaceInTreeByIdBigValForAdd() {
+    if (stateOfBalanceForAdd[1] != 1) {
         //donate the min from big to med
-        auto NodeToDonate = treeByIdBigVal->find(*contestantWithMinInTreeByIdBigVal, treeByIdBigVal->root);
+        auto NodeToDonate = treeByIdBigVal->find(minInTreeByIdBigVal, treeByIdBigVal->root);
         Contestant toDonate = *(NodeToDonate->getValue());
-        treeByIdBigVal->remove(*contestantWithMinInTreeByIdBigVal);
+        treeByIdBigVal->remove(minInTreeByIdBigVal);
+        Contestant_Key toRemoveStr = Contestant_Key(minInTreeByIdBigVal.id,minInTreeByIdBigVal.strength, true );
+        Contestant_Key toRemoveId = Contestant_Key(minInTreeByIdBigVal.id,minInTreeByIdBigVal.strength, false);
         toDonate.set_is_by_strength_sorted(true);
-        treeByStrengthBigVal->remove(toDonate);
+        treeByStrengthBigVal->remove(toRemoveStr);
         toDonate.set_is_by_strength_sorted(false);
-        treeByIdMedVal->insertAux(toDonate.get_contestantId(), toDonate);
+        treeByIdMedVal->insertAux(toRemoveId, toDonate);
         toDonate.set_is_by_strength_sorted(true);
-        treeByStrengthMedVal->insertAux(toDonate.get_strength(), toDonate);
+        treeByStrengthMedVal->insertAux(toRemoveStr, toDonate);
         if (treeByIdBigVal->numOfNodes == 0) {
-            this->maxInTreeByStrengthBigVal = 0;
-            this->maxInTreeByIdBigVal = 0;
-            this->minInTreeByIdBigVal = 0;
-            updateStateOfBalance();
+            this->maxInTreeByStrengthBigVal = Contestant_Key(0, 0, true);
+            this->maxInTreeByIdBigVal = Contestant_Key(0, 0, false);
+            this->minInTreeByIdBigVal = Contestant_Key(0, 0, false);
+            updateStateOfBalanceForAdd();
         }
         else {
-            updateTreeByStrengthBigVal(); //this one also updates the stated array
+            updateTreeByStrengthBigValForAdd(); //this one also updates the stated array
         }
-        updateTreeByStrengthMedVal();
+        updateTreeByStrengthMedValForAdd();
 
     }
     else {
         //donate the min from med to small
         //donate the min from big to med
-        auto NodeToDonate = treeByIdMedVal->find(*contestantWithMinInTreeByIdMedVal, treeByIdMedVal->root);
+        auto NodeToDonate = treeByIdMedVal->find(minInTreeByIdMedVal, treeByIdMedVal->root);
         Contestant toDonate = *(NodeToDonate->getValue());
-        treeByIdMedVal->remove(*contestantWithMinInTreeByIdMedVal);
-        toDonate.set_is_by_strength_sorted(true);
-        treeByStrengthMedVal->remove(toDonate);
-        toDonate.set_is_by_strength_sorted(false);
-        treeByIdSmallVal->insertAux(toDonate.get_contestantId(), toDonate);
-        toDonate.set_is_by_strength_sorted(true);
-        treeByStrengthSmallVal->insertAux(toDonate.get_strength(), toDonate);
+        treeByIdMedVal->remove(minInTreeByIdMedVal);
+        Contestant_Key removeStr = Contestant_Key(minInTreeByIdMedVal.id, minInTreeByIdMedVal.strength, true);
+        Contestant_Key removeId = Contestant_Key(minInTreeByIdMedVal.id, minInTreeByIdMedVal.strength, false);
+        treeByStrengthMedVal->remove(removeStr);
+        treeByIdSmallVal->insertAux(removeId, toDonate);
+        treeByStrengthSmallVal->insertAux(removeStr, toDonate);
         if (treeByIdMedVal->numOfNodes == 0) {
-            this->maxInTreeByStrengthMedVal = 0;
-            this->maxInTreeByIdMedVal = 0;
-            this->minInTreeByIdMedVal = 0;
-            updateStateOfBalance();
+            this->maxInTreeByStrengthMedVal =Contestant_Key(0, 0, true);
+            this->maxInTreeByIdMedVal =Contestant_Key(0, 0, false);
+            this->minInTreeByIdMedVal =Contestant_Key(0, 0, false);
+            updateStateOfBalanceForAdd();
         }
         else {
-            updateTreeByStrengthMedVal(); //this one also updates the stated array
+            updateTreeByStrengthMedValForAdd(); //this one also updates the stated array
         }
-        updateTreeByStrengthSmallVal();
+        updateTreeByStrengthSmallValForAdd();
         /*----now the next step, donate the min from big to med--------*/
-        auto NodeToDonate1 = treeByIdBigVal->find(*contestantWithMinInTreeByIdBigVal, treeByIdBigVal->root);
+        auto NodeToDonate1 = treeByIdBigVal->find(minInTreeByIdBigVal, treeByIdBigVal->root);
         Contestant toDonate1 = *(NodeToDonate1->getValue());
-        treeByIdBigVal->remove(toDonate1);
-        toDonate1.set_is_by_strength_sorted(true);
-        treeByStrengthBigVal->remove(toDonate1);
-        toDonate1.set_is_by_strength_sorted(false);
-        treeByIdMedVal->insertAux(toDonate1.get_contestantId(), toDonate1);
-        toDonate1.set_is_by_strength_sorted(true);
-        treeByStrengthMedVal->insertAux(toDonate1.get_strength(), toDonate1);
+        Contestant_Key toRemoveStr1 = Contestant_Key(minInTreeByIdBigVal.id, minInTreeByIdBigVal.strength, true);
+        Contestant_Key toRemoveId1 = Contestant_Key(minInTreeByIdBigVal.id, minInTreeByIdBigVal.strength, false);
+        treeByIdBigVal->remove(toRemoveId1);
+        treeByStrengthBigVal->remove(toRemoveStr1);
+        treeByIdMedVal->insertAux(toRemoveId1, toDonate1);
+        treeByStrengthMedVal->insertAux(toRemoveStr1, toDonate1);
         if (treeByIdBigVal->numOfNodes == 0) {
-            this->maxInTreeByStrengthBigVal = 0;
-            this->maxInTreeByIdBigVal = 0;
-            this->minInTreeByIdBigVal = 0;
-            updateStateOfBalance();
+            this->maxInTreeByStrengthBigVal =Contestant_Key(0, 0, true);
+            this->maxInTreeByIdBigVal =Contestant_Key(0, 0, false);
+            this->minInTreeByIdBigVal =Contestant_Key(0, 0, false);
+            updateStateOfBalanceForAdd();
         }
         else {
-            updateTreeByStrengthBigVal(); //this one also updates the stated array
+            updateTreeByStrengthBigValForAdd(); //this one also updates the stated array
         }
-        updateTreeByStrengthMedVal();
+        updateTreeByStrengthMedValForAdd();
     }
 }
-void Team::makePlaceInTreeByIdMedVal() {
-    if (stateOfBalance[2] != 1) {
+void Team::makePlaceInTreeByIdMedValForAdd() {
+    if (stateOfBalanceForAdd[2] != 1) {
         //donate the max from med tree to big tree
-        auto NodeToDonate = treeByIdMedVal->find(*contestantWithMaxInTreeByIdMedVal, treeByIdMedVal->root);
+        auto NodeToDonate = treeByIdMedVal->find(maxInTreeByIdMedVal, treeByIdMedVal->root);
         Contestant toDonate = *(NodeToDonate->getValue()); //copyConstructor?
-        treeByIdMedVal->remove(*contestantWithMaxInTreeByIdMedVal);
-        toDonate.set_is_by_strength_sorted(true);
-        treeByStrengthMedVal->remove(toDonate);
-        toDonate.set_is_by_strength_sorted(false);
-        treeByIdBigVal->insertAux(toDonate.get_contestantId(), toDonate);//remmember to insert to both of the trees
-        toDonate.set_is_by_strength_sorted(true);
-        treeByStrengthBigVal->insertAux(toDonate.get_strength(), toDonate);
+        treeByIdMedVal->remove(maxInTreeByIdMedVal);
+        Contestant_Key toRemoveStr = Contestant_Key(maxInTreeByIdMedVal.id, maxInTreeByIdMedVal.strength, true);
+        Contestant_Key toRemoveId = Contestant_Key(maxInTreeByIdMedVal.id, maxInTreeByIdMedVal.strength, false);
+        treeByStrengthMedVal->remove(toRemoveStr);
+        treeByIdBigVal->insertAux(toRemoveId, toDonate);//remmember to insert to both of the trees
+        treeByStrengthBigVal->insertAux(toRemoveStr, toDonate);
         if (treeByIdMedVal->numOfNodes == 0) {
-            this->maxInTreeByStrengthMedVal = 0;
-            this->maxInTreeByIdMedVal = 0;
-            this->minInTreeByIdMedVal = 0;
-            updateStateOfBalance();
+            this->maxInTreeByStrengthMedVal =Contestant_Key(0, 0, true);
+            this->maxInTreeByIdMedVal =Contestant_Key(0, 0, false);
+            this->minInTreeByIdMedVal =Contestant_Key(0, 0, false);
+            updateStateOfBalanceForAdd();
         }
         else {
-            updateTreeByStrengthMedVal(); //this one also updates the stated array
+            updateTreeByStrengthMedValForAdd(); //this one also updates the stated array
         }
-        updateTreeByStrengthBigVal();
+        updateTreeByStrengthBigValForAdd();
     }
     else {
         //donate the min from med to small
-        auto NodeToDonate = treeByIdMedVal->find(*contestantWithMinInTreeByIdMedVal, treeByIdMedVal->root);
+        auto NodeToDonate = treeByIdMedVal->find(minInTreeByIdMedVal, treeByIdMedVal->root);
         Contestant toDonate = *(NodeToDonate->getValue());
-        treeByIdMedVal->remove(*contestantWithMinInTreeByIdMedVal);
-        toDonate.set_is_by_strength_sorted(true);
-        treeByStrengthMedVal->remove(toDonate);
-        toDonate.set_is_by_strength_sorted(false);
-        treeByIdSmallVal->insertAux(toDonate.get_contestantId(), toDonate);
-        toDonate.set_is_by_strength_sorted(true);
-        treeByStrengthSmallVal->insertAux(toDonate.get_strength(), toDonate);
+        treeByIdMedVal->remove(minInTreeByIdMedVal);
+        Contestant_Key toRemoveId= Contestant_Key(minInTreeByIdMedVal.id, minInTreeByIdMedVal.strength, false);
+        Contestant_Key toRemoveStr= Contestant_Key(minInTreeByIdMedVal.id, minInTreeByIdMedVal.strength, true);
+        treeByStrengthMedVal->remove(toRemoveStr);
+        treeByIdSmallVal->insertAux(toRemoveId, toDonate);
+        treeByStrengthSmallVal->insertAux(toRemoveStr, toDonate);
         if (treeByIdMedVal->numOfNodes == 0) {
-            this->maxInTreeByStrengthMedVal = 0;
-            this->maxInTreeByIdMedVal = 0;
-            this->minInTreeByIdMedVal = 0;
-            updateStateOfBalance();
+            this->maxInTreeByStrengthMedVal =Contestant_Key(0, 0, true);
+            this->maxInTreeByIdMedVal =Contestant_Key(0, 0, false);
+            this->minInTreeByIdMedVal =Contestant_Key(0, 0, false);
+            updateStateOfBalanceForAdd();
         }
         else {
-            updateTreeByStrengthMedVal(); //this one also updates the stated array
+            updateTreeByStrengthMedValForAdd(); //this one also updates the stated array
         }
-        updateTreeByStrengthSmallVal();
+        updateTreeByStrengthSmallValForAdd();
 
 
     }
 }
-void Team::makePlaceInTreeByIdSmallVal() {
-    if (stateOfBalance[1] != 1) {
+void Team::makePlaceInTreeByIdSmallValForAdd() {
+    if (stateOfBalanceForAdd[1] != 1) {
         //delete the elem with max Id in smallTree and insert it to Med tree
         //update the states
         //update the max fiels in small tree, update the min field in med tree
         //update the max power in small tree, udate the max power field in mid tree
-        auto NodeToDonate = treeByIdSmallVal->find(*contestantWithMaxInTreeByIdSmallVal, treeByIdSmallVal->root);
+        auto NodeToDonate = treeByIdSmallVal->find(maxInTreeByIdSmallVal, treeByIdSmallVal->root);
         Contestant toDonate = *(NodeToDonate->getValue()); //copyConstructor?
-        treeByIdSmallVal->remove(*contestantWithMaxInTreeByIdSmallVal);
-        toDonate.set_is_by_strength_sorted(true);
-        treeByStrengthSmallVal->remove(toDonate); ////-----------------change it to removeWithRepetition
-        toDonate.set_is_by_strength_sorted(false);
-        treeByIdMedVal->insertAux(toDonate.get_contestantId(), toDonate);//remmember to insert to both of the trees
-        toDonate.set_is_by_strength_sorted(true);
-        treeByStrengthMedVal->insertAux(toDonate.get_strength(), toDonate);
+        treeByIdSmallVal->remove(maxInTreeByIdSmallVal);
+        Contestant_Key toRemoveStr = Contestant_Key(maxInTreeByIdSmallVal.id, maxInTreeByIdSmallVal.strength, true);
+        Contestant_Key toRemoveId = Contestant_Key(maxInTreeByIdSmallVal.id, maxInTreeByIdSmallVal.strength, false);
+        treeByStrengthSmallVal->remove(toRemoveStr); ////-----------------change it to removeWithRepetition
+        treeByIdMedVal->insertAux(toRemoveId, toDonate);//remmember to insert to both of the trees
+        treeByStrengthMedVal->insertAux(toRemoveStr, toDonate);
         if (treeByIdSmallVal->numOfNodes == 0) {
-            this->maxInTreeByStrengthSmallVal = 0;
-            this->maxInTreeByIdSmallVal = 0;
-            this->minInTreeByIdSmallVal = 0;
-            updateStateOfBalance();
+            this->maxInTreeByStrengthSmallVal =Contestant_Key(0, 0, true);
+            this->maxInTreeByIdSmallVal =Contestant_Key(0, 0, false);
+            this->minInTreeByIdSmallVal =Contestant_Key(0, 0, false);
+            updateStateOfBalanceForAdd();
         }
         else {
-            updateTreeByStrengthSmallVal(); //this one also updates the stated array
+            updateTreeByStrengthSmallValForAdd(); //this one also updates the stated array
         }
-        updateTreeByStrengthMedVal();
+        updateTreeByStrengthMedValForAdd();
     }
     else { //if stateOfBalnce[1] == 1, Med must donate to Big. And Small must donate to Med.
         //ask from med to donate his maxId to big tree
@@ -326,51 +329,49 @@ void Team::makePlaceInTreeByIdSmallVal() {
         //update states
         //update max and min fields Id of three trees
         //update max fields power of three trees
-        auto NodeToMoveToBig = treeByIdMedVal->find(*contestantWithMaxInTreeByIdMedVal,treeByIdMedVal->root);
+        auto NodeToMoveToBig = treeByIdMedVal->find(maxInTreeByIdMedVal,treeByIdMedVal->root);
         Contestant toMoveToBig = *(NodeToMoveToBig->getValue()); //copyConstructor?
-        treeByIdMedVal->remove(*contestantWithMaxInTreeByIdMedVal);
-        toMoveToBig.set_is_by_strength_sorted(true);
-        treeByStrengthMedVal->remove(toMoveToBig);
-        toMoveToBig.set_is_by_strength_sorted(false);
-        treeByIdBigVal->insertAux(toMoveToBig.get_contestantId(), toMoveToBig);
-        toMoveToBig.set_is_by_strength_sorted(true);
-        treeByStrengthBigVal->insertAux(toMoveToBig.get_strength(), toMoveToBig);
+        Contestant_Key toRemoveId = Contestant_Key(maxInTreeByIdMedVal.id, maxInTreeByIdMedVal.strength, false);
+        Contestant_Key toRemoveStr = Contestant_Key(maxInTreeByIdMedVal.id, maxInTreeByIdMedVal.strength, true);
+        treeByIdMedVal->remove(toRemoveId);
+        treeByStrengthMedVal->remove(toRemoveStr);
+        treeByIdBigVal->insertAux(toRemoveId, toMoveToBig);
+        treeByStrengthBigVal->insertAux(toRemoveStr, toMoveToBig);
         if (treeByIdMedVal->numOfNodes == 0) {
-            this->maxInTreeByStrengthMedVal = 0;
-            this->maxInTreeByIdMedVal = 0;
-            this->minInTreeByIdMedVal = 0;
-            updateStateOfBalance();
+            this->maxInTreeByStrengthMedVal =Contestant_Key(0, 0, true);
+            this->maxInTreeByIdMedVal=Contestant_Key(0, 0, false);
+            this->minInTreeByIdMedVal =Contestant_Key(0, 0, false);
+            updateStateOfBalanceForAdd();
         }
         else {
-            updateTreeByStrengthMedVal();
+            updateTreeByStrengthMedValForAdd();
         }
-        updateTreeByStrengthBigVal();
+        updateTreeByStrengthBigValForAdd();
         //this one also updates the stated array
         //now donating from small to med(now must be state[1] != 1)
-        auto NodeToMoveToMed = treeByIdSmallVal->find(*contestantWithMaxInTreeByIdSmallVal, treeByIdSmallVal->root);
+        auto NodeToMoveToMed = treeByIdSmallVal->find(maxInTreeByIdSmallVal, treeByIdSmallVal->root);
+        Contestant_Key toMoveStr = Contestant_Key(maxInTreeByIdSmallVal.id, maxInTreeByIdSmallVal.strength, true);
+        Contestant_Key toMoveId = Contestant_Key(maxInTreeByIdSmallVal.id, maxInTreeByIdSmallVal.strength, false);
         Contestant toMoveToMed = *(NodeToMoveToMed->getValue());
-        treeByIdSmallVal->remove(toMoveToMed);
-        toMoveToMed.set_is_by_strength_sorted(true);
-        treeByStrengthSmallVal->remove(toMoveToMed);
-        toMoveToMed.set_is_by_strength_sorted(false);
-        treeByIdMedVal->insertAux(toMoveToMed.get_contestantId(), toMoveToMed);
-        toMoveToMed.set_is_by_strength_sorted(true);
-        treeByStrengthMedVal->insertAux(toMoveToMed.get_strength(), toMoveToMed);
+        treeByIdSmallVal->remove(toMoveId);
+        treeByStrengthSmallVal->remove(toMoveStr);
+        treeByIdMedVal->insertAux(toMoveId, toMoveToMed);
+        treeByStrengthMedVal->insertAux(toMoveStr, toMoveToMed);
         if (treeByIdSmallVal->numOfNodes == 0) {
-            this->maxInTreeByStrengthSmallVal = 0;
-            this->maxInTreeByIdSmallVal = 0;
-            this->minInTreeByIdSmallVal = 0;
-            updateStateOfBalance();
+            this->maxInTreeByStrengthSmallVal =Contestant_Key(0, 0, true);
+            this->maxInTreeByIdSmallVal =Contestant_Key(0, 0, false);
+            this->minInTreeByIdSmallVal =Contestant_Key(0, 0, false);
+            updateStateOfBalanceForAdd();
         }
         else {
-            updateTreeByStrengthSmallVal(); //this one also updates the stated array
+            updateTreeByStrengthSmallValForAdd(); //this one also updates the stated array
         }//this one also updates the stated array
-        updateTreeByStrengthMedVal();
+        updateTreeByStrengthMedValForAdd();
 
     }
 }
 
-void Team::updateTreeByStrengthSmallVal() { //need to be here an update to the min max of by Id
+void Team::updateTreeByStrengthSmallValForAdd() { //need to be here an update to the min max of by Id
     //and also for max By strength
     this->maxInTreeByStrengthSmallVal = (this->treeByStrengthSmallVal->findMax
             (this->treeByStrengthSmallVal->root))->key;
@@ -378,9 +379,9 @@ void Team::updateTreeByStrengthSmallVal() { //need to be here an update to the m
     this->contestantWithMaxInTreeByIdSmallVal = (this->treeByIdSmallVal->findMax(treeByIdSmallVal->root))->getValue();
     this->minInTreeByIdSmallVal = (this->treeByIdSmallVal->findMin(treeByIdSmallVal->root))->key;
     this->contestantWithMinInTreeByIdSmallVal = (this->treeByIdSmallVal->findMin(treeByIdSmallVal->root))->getValue();
-    updateStateOfBalance();
+    updateStateOfBalanceForAdd();
 }
-void Team::updateTreeByStrengthMedVal() { //need to be here an update to the min max of by Id
+void Team::updateTreeByStrengthMedValForAdd() { //need to be here an update to the min max of by Id
     //and also for max By strength
     this->maxInTreeByStrengthMedVal = (this->treeByStrengthMedVal->findMax
             (this->treeByStrengthMedVal->root))->key;
@@ -388,9 +389,9 @@ void Team::updateTreeByStrengthMedVal() { //need to be here an update to the min
     this->contestantWithMaxInTreeByIdMedVal = (this->treeByIdMedVal->findMax(treeByIdMedVal->root))->getValue();
     this->minInTreeByIdMedVal = (this->treeByIdMedVal->findMin(treeByIdMedVal->root))->key;
     this->contestantWithMinInTreeByIdMedVal = (this->treeByIdMedVal->findMin(treeByIdMedVal->root))->getValue();
-    updateStateOfBalance();
+    updateStateOfBalanceForAdd();
 }
-void Team::updateTreeByStrengthBigVal() { //need to be here an update to the min max of by Id
+void Team::updateTreeByStrengthBigValForAdd() { //need to be here an update to the min max of by Id
     //and also for max By strength
     this->maxInTreeByStrengthBigVal = (this->treeByStrengthBigVal->findMax
             (this->treeByStrengthBigVal->root))->key;
@@ -398,69 +399,183 @@ void Team::updateTreeByStrengthBigVal() { //need to be here an update to the min
     this->contestantWithMaxInTreeByIdBigVal = (this->treeByIdBigVal->findMax(treeByIdBigVal->root))->getValue();
     this->minInTreeByIdBigVal = (this->treeByIdBigVal->findMin(treeByIdBigVal->root))->key;
     this->contestantWithMinInTreeByIdBigVal = (this->treeByIdBigVal->findMin(treeByIdBigVal->root))->getValue();
-    updateStateOfBalance();
+    updateStateOfBalanceForAdd();
 }
 
 void Team::addContestantToATeam(int contestantId, int countryId, int strength, Sport sport) {
     //Please Notice this one is added to the trees by strength
-    Contestant toAdd = Contestant(contestantId, countryId, strength, sport, true);
+    Contestant toAddStr = Contestant(contestantId, countryId, strength, sport, true);
+    Contestant_Key toAddKeyStr = Contestant_Key(contestantId, strength, true);
     //Please notice this one is added to the trees by Id
     Contestant toAddId = Contestant(contestantId, countryId, strength, sport, false);
-    team_whole_contestants_by_id->insertAux(contestantId, toAddId); //important for austerity_measures
-    team_whole_contestants_by_strength->insertAux(toAdd.get_strength(), toAdd);
+    Contestant_Key toAddKeyId = Contestant_Key(contestantId, strength, false);
+    team_whole_contestants_by_id->insertAux(toAddKeyId, toAddId); //important for austerity_measures
+    team_whole_contestants_by_strength->insertAux(toAddKeyStr, toAddStr);
     if (treeByIdSmallVal->numOfNodes == 0 && treeByIdMedVal->numOfNodes == 0 &&
         treeByIdBigVal->numOfNodes == 0) {
-        treeByStrengthSmallVal->insertAux(strength, toAdd); //One Tree is the mirror of the other tree
-        treeByIdSmallVal->insertAux(contestantId, toAddId);
-        updateTreeByStrengthSmallVal();
+        treeByStrengthSmallVal->insertAux(toAddKeyStr, toAddStr); //One Tree is the mirror of the other tree
+        treeByIdSmallVal->insertAux(toAddKeyId, toAddId);
+        updateTreeByStrengthSmallValForAdd();
         return;
     }
     if (contestantId < this->maxInTreeByIdSmallVal) {
-        if (stateOfBalance[0] < 1) {
-            this->treeByStrengthSmallVal->insertAux(strength, toAdd);
-            this->treeByIdSmallVal->insertAux(contestantId, toAddId);
-            updateTreeByStrengthSmallVal();
+        if (stateOfBalanceForAdd[0] < 1) {
+            this->treeByStrengthSmallVal->insertAux(toAddKeyStr, toAddStr);
+            this->treeByIdSmallVal->insertAux(toAddKeyId, toAddId);
+            updateTreeByStrengthSmallValForAdd();
         }
         else {
-            makePlaceInTreeByIdSmallVal();
-            this->treeByStrengthSmallVal->insertAux(strength, toAdd);
-            this->treeByIdSmallVal->insertAux(contestantId, toAddId);
-            updateTreeByStrengthSmallVal();
+            makePlaceInTreeByIdSmallValForAdd();
+            this->treeByStrengthSmallVal->insertAux(toAddKeyStr, toAddStr);
+            this->treeByIdSmallVal->insertAux(toAddKeyId, toAddId);
+            updateTreeByStrengthSmallValForAdd();
         }
     }
     else if (contestantId < maxInTreeByIdMedVal) {
-        if (stateOfBalance[1] < 1) {
-            this->treeByStrengthMedVal->insertAux(strength, toAdd);
-            this->treeByIdMedVal->insertAux(contestantId, toAddId);
-            updateTreeByStrengthMedVal();
+        if (stateOfBalanceForAdd[1] < 1) {
+            this->treeByStrengthMedVal->insertAux(toAddKeyStr, toAddStr);
+            this->treeByIdMedVal->insertAux(toAddKeyId, toAddId);
+            updateTreeByStrengthMedValForAdd();
         } else {
-            makePlaceInTreeByIdMedVal();
-            this->treeByStrengthMedVal->insertAux(strength, toAdd);
-            this->treeByIdMedVal->insertAux(contestantId, toAddId);
-            updateTreeByStrengthMedVal();
+            makePlaceInTreeByIdMedValForAdd();
+            this->treeByStrengthMedVal->insertAux(toAddKeyStr, toAddStr);
+            this->treeByIdMedVal->insertAux(toAddKeyId, toAddId);
+            updateTreeByStrengthMedValForAdd();
         }
     }
     else { //which only left the case where strength is bigger that maxInTreeByStrengthBigVal
-        if (stateOfBalance[2] < 1) {
-            this->treeByStrengthBigVal->insertAux(strength, toAdd);
-            this->treeByIdBigVal->insertAux(contestantId, toAddId);
-            updateTreeByStrengthBigVal();
+        if (stateOfBalanceForAdd[2] < 1) {
+            this->treeByStrengthBigVal->insertAux(toAddKeyStr, toAddStr);
+            this->treeByIdBigVal->insertAux(toAddKeyId, toAddId);
+            updateTreeByStrengthBigValForAdd();
         }
         else {
-            makePlaceInTreeByIdBigVal();
-            this->treeByStrengthBigVal->insertAux(strength, toAdd);
-            this->treeByIdBigVal->insertAux(contestantId, toAddId);
-            updateTreeByStrengthBigVal();
+            makePlaceInTreeByIdBigValForAdd();
+            this->treeByStrengthBigVal->insertAux(toAddKeyStr, toAddStr);
+            this->treeByIdBigVal->insertAux(toAddKeyId, toAddId);
+            updateTreeByStrengthBigValForAdd();
 
         }
     }
 }
-AvlTree<int, Contestant>* Team::get_team_whole_contestants_by_id() {
+AvlTree<Contestant_Key, Contestant>* Team::get_team_whole_contestants_by_id() {
     return this->team_whole_contestants_by_id;
 }
-AvlTree<int, Contestant>* Team::get_team_whole_contestants_by_strength() {
+AvlTree<Contestant_Key, Contestant>* Team::get_team_whole_contestants_by_strength() {
     return this->team_whole_contestants_by_strength;
 }
+void Team::updateStateOfBalanceForRemove() {
+    int numSmall = treeByIdSmallVal->numOfNodes;
+    int numMed = treeByIdMedVal->numOfNodes;
+    int numBig = treeByIdBigVal->numOfNodes;
+    if (treeByIdSmallVal->numOfNodes - treeByIdMedVal->numOfNodes >= treeByIdSmallVal->numOfNodes -
+                                                                     treeByIdBigVal->numOfNodes)
+        stateOfBalanceForRemove[0] = treeByIdSmallVal->numOfNodes - treeByIdBigVal->numOfNodes;
+    else {
+        stateOfBalanceForRemove[0] = treeByIdSmallVal->numOfNodes - treeByIdMedVal->numOfNodes;
+    }
+    if (treeByIdMedVal->numOfNodes - treeByIdSmallVal->numOfNodes >= treeByIdMedVal->numOfNodes -
+                                                                     treeByIdBigVal->numOfNodes) {
+        stateOfBalanceForRemove[1] = treeByIdMedVal->numOfNodes - treeByIdBigVal->numOfNodes;
+    }
+    else {
+        stateOfBalanceForRemove[1] = treeByIdMedVal->numOfNodes - treeByIdSmallVal->numOfNodes;
+    }
+    if (treeByIdBigVal->numOfNodes - treeByIdSmallVal->numOfNodes >= treeByIdBigVal->numOfNodes -
+                                                                     treeByIdMedVal->numOfNodes) {
+        stateOfBalanceForRemove[2] = treeByIdBigVal->numOfNodes - treeByIdMedVal->numOfNodes;
+    }
+    else {
+        stateOfBalanceForRemove[2] = treeByIdBigVal->numOfNodes - treeByIdSmallVal->numOfNodes;
+    }
+    return;
+}
+void Team::updateTreeByStrengthSmallValForRemove() { //need to be here an update to the min max of by Id
+    //and also for max By strength
+    this->maxInTreeByStrengthSmallVal = (this->treeByStrengthSmallVal->findMax
+            (this->treeByStrengthSmallVal->root))->key;
+    this->maxInTreeByIdSmallVal = (this->treeByIdSmallVal->findMax(treeByIdSmallVal->root))->key;
+    this->contestantWithMaxInTreeByIdSmallVal = (this->treeByIdSmallVal->findMax(treeByIdSmallVal->root))->getValue();
+    this->minInTreeByIdSmallVal = (this->treeByIdSmallVal->findMin(treeByIdSmallVal->root))->key;
+    this->contestantWithMinInTreeByIdSmallVal = (this->treeByIdSmallVal->findMin(treeByIdSmallVal->root))->getValue();
+    updateStateOfBalanceForRemove();
+}
+void Team::updateTreeByStrengthMedValForRemove() { //need to be here an update to the min max of by Id
+    //and also for max By strength
+    this->maxInTreeByStrengthMedVal = (this->treeByStrengthMedVal->findMax
+            (this->treeByStrengthMedVal->root))->key;
+    this->maxInTreeByIdMedVal = (this->treeByIdMedVal->findMax(treeByIdMedVal->root))->key;
+    this->contestantWithMaxInTreeByIdMedVal = (this->treeByIdMedVal->findMax(treeByIdMedVal->root))->getValue();
+    this->minInTreeByIdMedVal = (this->treeByIdMedVal->findMin(treeByIdMedVal->root))->key;
+    this->contestantWithMinInTreeByIdMedVal = (this->treeByIdMedVal->findMin(treeByIdMedVal->root))->getValue();
+    updateStateOfBalanceForRemove();
+}
+void Team::updateTreeByStrengthBigValForRemove() { //need to be here an update to the min max of by Id
+    //and also for max By strength
+    this->maxInTreeByStrengthBigVal = (this->treeByStrengthBigVal->findMax
+            (this->treeByStrengthBigVal->root))->key;
+    this->maxInTreeByIdBigVal = (this->treeByIdBigVal->findMax(treeByIdBigVal->root))->key;
+    this->contestantWithMaxInTreeByIdBigVal = (this->treeByIdBigVal->findMax(treeByIdBigVal->root))->getValue();
+    this->minInTreeByIdBigVal = (this->treeByIdBigVal->findMin(treeByIdBigVal->root))->key;
+    this->contestantWithMinInTreeByIdBigVal = (this->treeByIdBigVal->findMin(treeByIdBigVal->root))->getValue();
+    updateStateOfBalanceForRemove();
+}
+/*
+void Team::removeContestantFromTeam(Contestant const& toRemove) {
+    Contestant toRemoveId = toRemove;
+    toRemoveId.set_is_by_strength_sorted(true);
+    Contestant toRemoveStrength = toRemoveId;
+    toRemoveId.set_is_by_strength_sorted(false);
+    if (toRemoveId.get_contestantId() <= this->maxInTreeByIdSmallVal) {
+        if (stateOfBalanceForRemove[0] > -1) { //meaning if we can remove from the small tree by Id
+            this->treeByStrengthSmallVal->remove(toRemoveStrength);
+            this->treeByIdSmallVal->remove(toRemoveId);
+            updateTreeByStrengthSmallValForRemove();
+        }
+        else {
+            makePlaceInTreeByIdSmallValForRemove();
+            this->treeByStrengthSmallVal->remove(toRemoveStrength);
+            this->treeByIdSmallVal->remove(toRemoveId);
+            updateTreeByStrengthSmallValForRemove();
+        }
+    }
+    else if (toRemove.get_contestantId() <= maxInTreeByIdMedVal) {
+        if (stateOfBalanceForRemove[1] > -1) {
+            this->treeByStrengthMedVal->remove(toRemoveStrength);
+            this->treeByIdMedVal->remove(toRemoveId);
+            updateTreeByStrengthMedValForRemove();
+        } else {
+            makePlaceInTreeByIdMedValForRemove();
+            this->treeByStrengthMedVal->remove(toRemoveStrength);
+            this->treeByIdMedVal->remove(toRemoveId);
+            updateTreeByStrengthMedValForRemove();
+        }
+    }
+    else { //which only left the case where id is bigger that maxInTreeByStrengthMedVal, therefore it must be in the
+        // Big tree
+        if (stateOfBalanceForAdd[2] > -1) {
+            this->treeByStrengthBigVal->remove(toRemoveStrength);
+            this->treeByIdBigVal->remove(toRemoveId);
+            updateTreeByStrengthBigValForRemove();
+        }
+        else {
+            makePlaceInTreeByIdBigValForRemove();
+            this->treeByStrengthBigVal->remove(toRemoveStrength);
+            this->treeByIdBigVal->remove(toRemoveId);
+            updateTreeByStrengthBigValForRemove();
+
+        }
+    }
+}
+void Team::makePlaceInTreeByIdBigValForRemove() {
+
+}
+void Team::makePlaceInTreeByIdMedValForRemove() {
+
+}
+void Team::makePlaceInTreeByIdSmallValForRemove() {
+
+}*/
 /*
 void Team::updateOptimalTeamStrength() {
     if (team_whole_contestants_by_id->numOfNodes == 0) {
