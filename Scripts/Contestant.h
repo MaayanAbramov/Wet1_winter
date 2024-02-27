@@ -11,6 +11,7 @@
 //
 #include "AvlTree.h"
 #include "wet1util.h"
+#define TEAM_TYPE_INIT 5
 
 
 class Contestant {
@@ -19,6 +20,7 @@ class Contestant {
     int strength;
     Sport sport;
     bool is_by_strength_sorted;
+    Sport* teamsIParticipate;
 
 
 public:
@@ -35,6 +37,8 @@ public:
     Sport get_sport() const;
     bool get_is_by_strength_sorted() const;
     void set_is_by_strength_sorted(bool is_by_strength);
+    Sport* get_teamsIParticipate(int index) const;
+    void set_teamsIparticipate(int index, const Sport& sport);
 
 };
 

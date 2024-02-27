@@ -11,6 +11,9 @@ Contestant::Contestant() {
     this->strength = 0;
     this->sport = Sport::BOULDERING;
     this->is_by_strength_sorted = -1;
+    for (int i = 0 ; i < 3 ; i++) {
+        teamsIParticipate[i] = static_cast<Sport>(TEAM_TYPE_INIT);
+    }
 }
 
 Contestant::Contestant(int contestantId, int countryId, int strength, Sport sport, bool is_by_strength_sorted_) {
@@ -76,4 +79,11 @@ bool Contestant::get_is_by_strength_sorted() const {
 }
 void Contestant::set_is_by_strength_sorted(bool is_by_strength) {
     this->is_by_strength_sorted = is_by_strength;
+}
+
+Sport* Contestant::get_teamsIParticipate(int index) const {
+    return &(this->teamsIParticipate[index]);
+}
+void Contestant::set_teamsIparticipate(int index, const Sport& sport) {
+    this->teamsIParticipate[index] = sport;
 }

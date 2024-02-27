@@ -33,11 +33,12 @@ Team::~Team() {
 Team::Team() {
     this->teamId = 0;
     this->numParticipants = 0;
-    this->sport = Sport::BOULDERING; //only for initialization
+    this->sport = static_cast<Sport>(TEAM_TYPE_INIT); //only for initialization
     this->myCountry = 0;
     for (int i = 0 ; i < 3 ; i++) {
         this->stateOfBalance[i] = 0;
     }
+
     this->team_whole_contestants_by_id = new AvlTree<int, Contestant>();
     this->team_whole_contestants_by_strength = new AvlTree<int, Contestant>();
     this->treeByIdBigVal = new AvlTree<int, Contestant>();
@@ -82,7 +83,7 @@ Team::Team(int teamId, Sport sport, int numParticipants, int countryId) {
     this->treeByStrengthBigVal = new AvlTree<int, Contestant>();
     this->treeByStrengthMedVal = new AvlTree<int, Contestant>();
     this->treeByStrengthSmallVal = new AvlTree<int, Contestant>();
-    if (numParticipants == 0 ) {
+    if (numParticipants == 0) {
         for (int i = 0 ; i < 3 ; i++) {
             stateOfBalance[i] = 0;
         }
