@@ -134,20 +134,20 @@ void Team::updateStateOfBalance() {
     int numMed = treeByIdMedVal->numOfNodes;
     int numBig = treeByIdBigVal->numOfNodes;
     if (treeByIdSmallVal->numOfNodes - treeByIdMedVal->numOfNodes >= treeByIdSmallVal->numOfNodes -
-                                                                                 treeByIdBigVal->numOfNodes)
+                                                                     treeByIdBigVal->numOfNodes)
         stateOfBalance[0] = treeByIdSmallVal->numOfNodes - treeByIdMedVal->numOfNodes;
     else {
         stateOfBalance[0] = treeByIdSmallVal->numOfNodes - treeByIdBigVal->numOfNodes;
     }
     if (treeByIdMedVal->numOfNodes - treeByIdSmallVal->numOfNodes >= treeByIdMedVal->numOfNodes -
-                                                                                 treeByIdBigVal->numOfNodes) {
+                                                                     treeByIdBigVal->numOfNodes) {
         stateOfBalance[1] = treeByIdMedVal->numOfNodes - treeByIdSmallVal->numOfNodes;
     }
     else {
         stateOfBalance[1] = treeByIdMedVal->numOfNodes - treeByIdBigVal->numOfNodes;
     }
     if (treeByIdBigVal->numOfNodes - treeByIdSmallVal->numOfNodes >= treeByIdBigVal->numOfNodes -
-                                                                                 treeByIdMedVal->numOfNodes) {
+                                                                     treeByIdMedVal->numOfNodes) {
         stateOfBalance[2] = treeByIdBigVal->numOfNodes - treeByIdSmallVal->numOfNodes;
     }
     else {
@@ -198,7 +198,7 @@ void Team::makePlaceInTreeByIdBigVal() {
             updateTreeByStrengthMedVal(); //this one also updates the stated array
         }
         updateTreeByStrengthSmallVal();
-         /*----now the next step, donate the min from big to med--------*/
+        /*----now the next step, donate the min from big to med--------*/
         auto NodeToDonate1 = treeByIdBigVal->find(minInTreeByIdBigVal, treeByIdBigVal->root);
         Contestant toDonate1 = *(NodeToDonate1->getValue());
         treeByIdBigVal->remove(toDonate1.get_contestantId());
@@ -410,6 +410,12 @@ void Team::addContestantToATeam(int contestantId, int countryId, int strength, S
 
         }
     }
+}
+AvlTree<int, Contestant>* Team::get_team_whole_contestants_by_id() {
+    return this->team_whole_contestants_by_id;
+}
+AvlTree<int, Contestant>* Team::get_team_whole_contestants_by_strength() {
+    return this->team_whole_contestants_by_strength;
 }
 /*
 void Team::updateOptimalTeamStrength() {

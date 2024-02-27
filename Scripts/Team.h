@@ -71,6 +71,9 @@ public:
     AvlTree<int, Contestant>* get_treeByStrengthBigVal();
     AvlTree<int, Contestant>* get_treeByStrengthMedVal();
     AvlTree<int, Contestant>* get_treeByStrengthSmallVal();
+
+    AvlTree<int, Contestant>* get_team_whole_contestants_by_id();
+    AvlTree<int, Contestant>* get_team_whole_contestants_by_strength();
 };
 
 #endif //WINTERAVLTREE_TEAM_H

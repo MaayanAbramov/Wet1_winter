@@ -180,7 +180,7 @@ typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::find(const Key& key, No
     if (curr_node == nullptr || *(curr_node->getKey()) == key) {
         return curr_node;
     }
-    return (key < *(curr_node->getKey())) ? find(key, curr_node->left) : find(key, curr_node->right);
+    return ( key < *(curr_node->getKey())) ? find(key, curr_node->left) : find(key, curr_node->right);
 }
 
 template <class Key, class Value>
@@ -372,10 +372,11 @@ void AvlTree<Key, Value>::insertAux(const Key& key, const Value& value) {
 template <class Key, class Value>
 void AvlTree<Key, Value>::recursive_insert(Node* curr_node, const Key& key, const
 Value& value, bool* createdAlready) {
-    if (*(curr_node->getKey()) == key && !*createdAlready) {
+    if (*(curr_node->getKey()) == key && *(curr_node->getValue()) == value && !*createdAlready) {
         throw invalid_argument("the key already exists");
     }
-    if (key < *(curr_node->getKey()) && curr_node->left == nullptr) {
+    if ((key < *(curr_node->getKey()) || value < *(curr_node->getValue())) && curr_node->left == nullptr) { //always
+        // think about the case where the strength are the same (keys the same, but the contestantId no)
         numOfNodes++;
         //Value* valueToInsert = new Value(value)
         curr_node->left = new Node(key, value);
@@ -383,16 +384,16 @@ Value& value, bool* createdAlready) {
         updateFieldsAfterChangeInTree(curr_node->left);
         *createdAlready = true;
     }
-    if (key > *(curr_node->getKey()) && curr_node->right == nullptr) {
+    if ((key > *(curr_node->getKey()) || value > (*(curr_node->getValue()))) && curr_node->right == nullptr) {
         numOfNodes++;
         curr_node->right = new Node(key, value);
         curr_node->right->father = curr_node;
         updateFieldsAfterChangeInTree(curr_node->right);
         *createdAlready = true;
     }
-    if (key > *(curr_node->getKey()) && !(*createdAlready)) {
+    if ((key > *(curr_node->getKey()) || value > *(curr_node->getValue())) && !(*createdAlready)) {
         recursive_insert(curr_node->right, key, value, createdAlready);
-    } else if (key < *(curr_node->getKey()) && !(*createdAlready)) {
+    } else if ((key < *(curr_node->getKey()) || value < *(curr_node->getValue())) && !(*createdAlready)) {
         recursive_insert(curr_node->left, key, value, createdAlready);
     }
     updateFieldsAfterChangeInTree(curr_node);

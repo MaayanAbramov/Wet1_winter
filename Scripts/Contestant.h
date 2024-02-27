@@ -26,6 +26,7 @@ public:
     Contestant(int contestantId, int countryId, int strength, Sport sport, bool is_by_strength_sorted);
     Contestant(const Contestant& other);
     ~Contestant() = default;
+    bool operator==(const Contestant& other) const;
     friend bool operator<(const Contestant& num1, const Contestant& num2);
     friend bool operator>(const Contestant& num1, const Contestant& num2);
     int get_contestantId() const;
