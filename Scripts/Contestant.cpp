@@ -6,11 +6,11 @@
 #include "wet1util.h"
 
 Contestant::Contestant() {
-    this->contestantId = 0;
+    this->contestantId = -2;
     this->countryId = 0;
-    this->strength = 0;
+    this->strength = -2;
     this->sport = Sport::BOULDERING;
-    this->is_by_strength_sorted = -1;
+    this->is_by_strength_sorted = 0;
     for (int i = 0 ; i < 3 ; i++) {
         teamsIParticipate[i] = static_cast<Sport>(TEAM_TYPE_INIT);
     }

@@ -27,6 +27,9 @@ public:
     friend bool operator<(const Country_Key& key1, const Country_Key& key2){
         return key1.id < key2.id;
     }
+    friend bool operator>(const Country_Key& key1, const Country_Key& key2){
+        return key1.id > key2.id;
+    }
 };
 class Country {
     int countryId;

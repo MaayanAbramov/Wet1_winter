@@ -479,7 +479,7 @@ typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::findNextNodeInOrder(con
     Node* successor = nullptr;
     Node* temp = root;
     while (temp) {
-        if (key >= *(temp->getKey())) {
+        if (!(key < *(temp->getKey()))) {
             temp = temp->right;
         }
         else {

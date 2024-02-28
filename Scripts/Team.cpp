@@ -404,55 +404,54 @@ void Team::updateTreeByStrengthBigValForAdd() { //need to be here an update to t
 
 void Team::addContestantToATeam(int contestantId, int countryId, int strength, Sport sport) {
     //Please Notice this one is added to the trees by strength
-    Contestant toAddStr = Contestant(contestantId, countryId, strength, sport, true);
+    Contestant toAdd = Contestant(contestantId, countryId, strength, sport, true);
     Contestant_Key toAddKeyStr = Contestant_Key(contestantId, strength, true);
     //Please notice this one is added to the trees by Id
-    Contestant toAddId = Contestant(contestantId, countryId, strength, sport, false);
     Contestant_Key toAddKeyId = Contestant_Key(contestantId, strength, false);
-    team_whole_contestants_by_id->insertAux(toAddKeyId, toAddId); //important for austerity_measures
-    team_whole_contestants_by_strength->insertAux(toAddKeyStr, toAddStr);
+    team_whole_contestants_by_id->insertAux(toAddKeyId, toAdd); //important for austerity_measures
+    team_whole_contestants_by_strength->insertAux(toAddKeyStr, toAdd);
     if (treeByIdSmallVal->numOfNodes == 0 && treeByIdMedVal->numOfNodes == 0 &&
         treeByIdBigVal->numOfNodes == 0) {
-        treeByStrengthSmallVal->insertAux(toAddKeyStr, toAddStr); //One Tree is the mirror of the other tree
-        treeByIdSmallVal->insertAux(toAddKeyId, toAddId);
+        treeByStrengthSmallVal->insertAux(toAddKeyStr, toAdd); //One Tree is the mirror of the other tree
+        treeByIdSmallVal->insertAux(toAddKeyId, toAdd);
         updateTreeByStrengthSmallValForAdd();
         return;
     }
-    if (contestantId < this->maxInTreeByIdSmallVal) {
+    if (contestantId < this->maxInTreeByIdSmallVal.id) {
         if (stateOfBalanceForAdd[0] < 1) {
-            this->treeByStrengthSmallVal->insertAux(toAddKeyStr, toAddStr);
-            this->treeByIdSmallVal->insertAux(toAddKeyId, toAddId);
+            this->treeByStrengthSmallVal->insertAux(toAddKeyStr, toAdd);
+            this->treeByIdSmallVal->insertAux(toAddKeyId, toAdd);
             updateTreeByStrengthSmallValForAdd();
         }
         else {
             makePlaceInTreeByIdSmallValForAdd();
-            this->treeByStrengthSmallVal->insertAux(toAddKeyStr, toAddStr);
-            this->treeByIdSmallVal->insertAux(toAddKeyId, toAddId);
+            this->treeByStrengthSmallVal->insertAux(toAddKeyStr, toAdd);
+            this->treeByIdSmallVal->insertAux(toAddKeyId, toAdd);
             updateTreeByStrengthSmallValForAdd();
         }
     }
-    else if (contestantId < maxInTreeByIdMedVal) {
+    else if (contestantId < maxInTreeByIdMedVal.id) {
         if (stateOfBalanceForAdd[1] < 1) {
-            this->treeByStrengthMedVal->insertAux(toAddKeyStr, toAddStr);
-            this->treeByIdMedVal->insertAux(toAddKeyId, toAddId);
+            this->treeByStrengthMedVal->insertAux(toAddKeyStr, toAdd);
+            this->treeByIdMedVal->insertAux(toAddKeyId, toAdd);
             updateTreeByStrengthMedValForAdd();
         } else {
             makePlaceInTreeByIdMedValForAdd();
-            this->treeByStrengthMedVal->insertAux(toAddKeyStr, toAddStr);
-            this->treeByIdMedVal->insertAux(toAddKeyId, toAddId);
+            this->treeByStrengthMedVal->insertAux(toAddKeyStr, toAdd);
+            this->treeByIdMedVal->insertAux(toAddKeyId, toAdd);
             updateTreeByStrengthMedValForAdd();
         }
     }
     else { //which only left the case where strength is bigger that maxInTreeByStrengthBigVal
         if (stateOfBalanceForAdd[2] < 1) {
-            this->treeByStrengthBigVal->insertAux(toAddKeyStr, toAddStr);
-            this->treeByIdBigVal->insertAux(toAddKeyId, toAddId);
+            this->treeByStrengthBigVal->insertAux(toAddKeyStr, toAdd);
+            this->treeByIdBigVal->insertAux(toAddKeyId, toAdd);
             updateTreeByStrengthBigValForAdd();
         }
         else {
             makePlaceInTreeByIdBigValForAdd();
-            this->treeByStrengthBigVal->insertAux(toAddKeyStr, toAddStr);
-            this->treeByIdBigVal->insertAux(toAddKeyId, toAddId);
+            this->treeByStrengthBigVal->insertAux(toAddKeyStr, toAdd);
+            this->treeByIdBigVal->insertAux(toAddKeyId, toAdd);
             updateTreeByStrengthBigValForAdd();
 
         }
@@ -464,6 +463,7 @@ AvlTree<Contestant_Key, Contestant>* Team::get_team_whole_contestants_by_id() {
 AvlTree<Contestant_Key, Contestant>* Team::get_team_whole_contestants_by_strength() {
     return this->team_whole_contestants_by_strength;
 }
+/*
 void Team::updateStateOfBalanceForRemove() {
     int numSmall = treeByIdSmallVal->numOfNodes;
     int numMed = treeByIdMedVal->numOfNodes;
@@ -519,7 +519,7 @@ void Team::updateTreeByStrengthBigValForRemove() { //need to be here an update t
     this->minInTreeByIdBigVal = (this->treeByIdBigVal->findMin(treeByIdBigVal->root))->key;
     this->contestantWithMinInTreeByIdBigVal = (this->treeByIdBigVal->findMin(treeByIdBigVal->root))->getValue();
     updateStateOfBalanceForRemove();
-}
+}*/
 /*
 void Team::removeContestantFromTeam(Contestant const& toRemove) {
     Contestant toRemoveId = toRemove;

@@ -20,6 +20,9 @@ public:
     friend bool operator<(const Team_Key& key1, const Team_Key& key2){
         return key1.id < key2.id;
     }
+    friend bool operator>(const Team_Key& key1, const Team_Key& key2){
+        return key1.id > key2.id;
+    }
     bool operator==(const Team_Key& key2){
         return this->id == key2.id;
     }
@@ -73,20 +76,20 @@ public:
     void makePlaceInTreeByIdBigValForAdd();
     void makePlaceInTreeByIdMedValForAdd();
     void makePlaceInTreeByIdSmallValForAdd();
-    void makePlaceInTreeByIdBigValForRemove(); // you can understand it better with the name "make it able to delete
+    //void makePlaceInTreeByIdBigValForRemove(); // you can understand it better with the name "make it able to delete
     // from big tree
-    void makePlaceInTreeByIdMedValForRemove();
-    void makePlaceInTreeByIdSmallValForRemove();
+    //void makePlaceInTreeByIdMedValForRemove();
+    //void makePlaceInTreeByIdSmallValForRemove();
 
     void updateTreeByStrengthSmallValForAdd(); //notice : name not correct!. this one updates both of small trees
     void updateTreeByStrengthMedValForAdd();//notice : name not correct!. this one updates both of med trees
     void updateTreeByStrengthBigValForAdd(); //notice : name not correct!. this one updates both of big trees
-    void updateTreeByStrengthSmallValForRemove(); //notice : name not correct!. this one updates both of small trees
-    void updateTreeByStrengthMedValForRemove();//notice : name not correct!. this one updates both of med trees
-    void updateTreeByStrengthBigValForRemove(); //notice : name not correct!. this one updates both of big trees
+    //void updateTreeByStrengthSmallValForRemove(); //notice : name not correct!. this one updates both of small trees
+    //void updateTreeByStrengthMedValForRemove();//notice : name not correct!. this one updates both of med trees
+    //void updateTreeByStrengthBigValForRemove(); //notice : name not correct!. this one updates both of big trees
     void addContestantToATeam(int contestantId, int countryId, int strength, Sport sport);
-    void updateStateOfBalanceForRemove();
-    void removeContestantFromTeam(Contestant const& toRemove); //toRemove should be contestant with flag 0
+    //void updateStateOfBalanceForRemove();
+    //void removeContestantFromTeam(Contestant const& toRemove); //toRemove should be contestant with flag 0
     //void updateOptimalTeamStrength();
     // about the Contestant
     Contestant_Key get_maxInTreeByStrengthBigVal();
