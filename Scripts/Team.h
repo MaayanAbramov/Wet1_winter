@@ -73,23 +73,25 @@ public:
     int getCountryId() const;
     int getStateOfBalanceForAdd(int index);
     void updateStateOfBalanceForAdd();
+    int getStateOfBalanceForRemove(int index);
+    void updateStateOfBalanceForRemove();
     void makePlaceInTreeByIdBigValForAdd();
     void makePlaceInTreeByIdMedValForAdd();
     void makePlaceInTreeByIdSmallValForAdd();
-    //void makePlaceInTreeByIdBigValForRemove(); // you can understand it better with the name "make it able to delete
+    void makePlaceInTreeByIdBigValForRemove(); // you can understand it better with the name "make it able to delete
     // from big tree
-    //void makePlaceInTreeByIdMedValForRemove();
-    //void makePlaceInTreeByIdSmallValForRemove();
+    void makePlaceInTreeByIdMedValForRemove();
+    void makePlaceInTreeByIdSmallValForRemove();
 
     void updateTreeByStrengthSmallValForAdd(); //notice : name not correct!. this one updates both of small trees
     void updateTreeByStrengthMedValForAdd();//notice : name not correct!. this one updates both of med trees
     void updateTreeByStrengthBigValForAdd(); //notice : name not correct!. this one updates both of big trees
-    //void updateTreeByStrengthSmallValForRemove(); //notice : name not correct!. this one updates both of small trees
-    //void updateTreeByStrengthMedValForRemove();//notice : name not correct!. this one updates both of med trees
-    //void updateTreeByStrengthBigValForRemove(); //notice : name not correct!. this one updates both of big trees
+    void updateTreeByStrengthSmallValForRemove(); //notice : name not correct!. this one updates both of small trees
+    void updateTreeByStrengthMedValForRemove();//notice : name not correct!. this one updates both of med trees
+    void updateTreeByStrengthBigValForRemove(); //notice : name not correct!. this one updates both of big trees
     void addContestantToATeam(int contestantId, int countryId, int strength, Sport sport);
-    //void updateStateOfBalanceForRemove();
-    //void removeContestantFromTeam(Contestant const& toRemove); //toRemove should be contestant with flag 0
+
+    void removeContestantFromTeam(const Contestant_Key & keyToRemove); //toRemove should be contestant with flag 0
     //void updateOptimalTeamStrength();
     // about the Contestant
     Contestant_Key get_maxInTreeByStrengthBigVal();

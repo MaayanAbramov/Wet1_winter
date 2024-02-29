@@ -7,17 +7,12 @@
 int main() {
 
     Team* team = new Team(1, Sport::ACROBATICS, 0, 123); // Example values for teamId, sport, numParticipants, and
-    // countryId
-//    team->updateStateOfBalanceForAdd();
-//
-//
-// team->addContestantToATeam(i, 123, i, Sport::ACROBATICS);
-    //team->addContestantToATeam(1, 123, 1, Sport::ACROBATICS);
-    for (int i = 0; i <= 5000 ; ++i) {
-//        team->addContestantToATeam(i, 123, i, Sport::ACROBATICS);
-//        team->addContestantToATeam(200+i, 123, 200+i, Sport::ACROBATICS);
-        team->addContestantToATeam(i, 123, i, Sport::SPINNING);
 
+    for (int i = 0; i <= 5000 ; ++i) {
+        team->addContestantToATeam(i, 123, i, Sport::ACROBATICS);
+    }
+    for(int i = 0 ; i <= 5000; i++){
+        team->removeContestantFromTeam(Contestant_Key(i,i,false));
     }
 //    team->addContestantToATeam(10, 123, 3, Sport::ACROBATICS);
 //    team->addContestantToATeam(13, 123, 6, Sport::ACROBATICS);
@@ -32,17 +27,30 @@ int main() {
 //    team->addContestantToATeam(16, 0, 14, Sport::ACROBATICS);
 //    team->addContestantToATeam(18, 0, 4, Sport::ACROBATICS);
     /*-----------------------------------------------------------------------------------------*/
-//    team->addContestantToATeam(3, 0, 2, Sport::ACROBATICS);
-//    team->addContestantToATeam(1, 0, 2, Sport::ACROBATICS);
-//    team->addContestantToATeam(0, 0, 2, Sport::ACROBATICS);
-    /*team->addContestantToATeam(10, 0, 3, Sport::ACROBATICS);
-    team->addContestantToATeam(9, 0, 7, Sport::ACROBATICS);
-    team->addContestantToATeam(11, 0, 7, Sport::ACROBATICS);
-    team->addContestantToATeam(16, 0, 14, Sport::ACROBATICS);
-    team->addContestantToATeam(18, 0, 4, Sport::ACROBATICS);*/
+//    team->addContestantToATeam(18, 0, 4, Sport::ACROBATICS);
+//    team->addContestantToATeam(13, 0, 6, Sport::ACROBATICS);
+//    team->addContestantToATeam(9, 0, 7, Sport::ACROBATICS);
+//    team->addContestantToATeam(16, 0, 14, Sport::ACROBATICS);
+//    team->addContestantToATeam(12, 0, 5, Sport::ACROBATICS);
+//    team->addContestantToATeam(8, 0, 4, Sport::ACROBATICS);
+//    team->addContestantToATeam(15, 0, 9, Sport::ACROBATICS);
+//    team->addContestantToATeam(11, 0, 7, Sport::ACROBATICS);
+//    team->addContestantToATeam(7, 0, 2, Sport::ACROBATICS);
+//    team->addContestantToATeam(14, 0, 0, Sport::ACROBATICS);
+//    team->addContestantToATeam(10, 0, 3, Sport::ACROBATICS);
+//    team->addContestantToATeam(6, 0, 6, Sport::ACROBATICS);
+//    team->removeContestantFromTeam(Contestant_Key(18, 4, false));
+//    team->removeContestantFromTeam(Contestant_Key(16, 14, false));
+//    team->removeContestantFromTeam(Contestant_Key(9, 7, false));
+//    team->removeContestantFromTeam(Contestant_Key(11, 7, false));
+//    team->removeContestantFromTeam(Contestant_Key(12, 5, false));
 
     for (int i = 0 ; i < 3 ; i++) {
         cout << "#updateStateOfBalance " << team->getStateOfBalanceForAdd(i) <<endl;
+    }
+    cout << "#remove status array" << endl;
+    for (int i = 0 ; i < 3 ; i++) {
+        cout << "#updateStateOfBalance " << team->getStateOfBalanceForRemove(i) <<endl;
     }
     cout << "hello" << endl;
     return 0;
