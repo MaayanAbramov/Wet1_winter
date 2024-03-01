@@ -392,7 +392,7 @@ void Team::updateTreeByStrengthBigValForAdd() { //need to be here an update to t
     updateStateOfBalanceForRemove();
 }
 
-void Team::addContestantToATeam(int contestantId, int countryId, int strength, Sport sport) {
+void Team::addContestantToATeam(int contestantId, int countryId, int strength, Sport sport, bool called_from_optimal) {
     //Please Notice this one is added to the trees by strength
     Contestant toAdd = Contestant(contestantId, countryId, strength, sport, true);
     Contestant_Key toAddKeyStr = Contestant_Key(contestantId, strength, true);
@@ -405,6 +405,9 @@ void Team::addContestantToATeam(int contestantId, int countryId, int strength, S
         treeByStrengthSmallVal->insertAux(toAddKeyStr, toAdd); //One Tree is the mirror of the other tree
         treeByIdSmallVal->insertAux(toAddKeyId, toAdd);
         updateTreeByStrengthSmallValForAdd();
+        if(called_from_optimal == false) {
+            updateOptimalTeamStrength();
+        }
         return;
     }
     if (contestantId < this->maxInTreeByIdSmallVal.id) {
@@ -445,6 +448,9 @@ void Team::addContestantToATeam(int contestantId, int countryId, int strength, S
             updateTreeByStrengthBigValForAdd();
 
         }
+    }
+    if(called_from_optimal == false) {
+        updateOptimalTeamStrength();
     }
 }
 AvlTree<Contestant_Key, Contestant>* Team::get_team_whole_contestants_by_id() {
@@ -720,7 +726,10 @@ void Team::makePlaceInTreeByIdSmallValForRemove() {
 }
 
 
-void Team::removeContestantFromTeam(const Contestant_Key&  keyToRemove) { //Omer check in olympics if the trees are
+void Team::removeContestantFromTeam(const Contestant_Key&  keyToRemove, bool called_from_optimal) { //Omer check
+    // in olympics
+    // if
+    // the trees are
     // empty before calling to this function
     Contestant_Key toRemoveKeyStr = Contestant_Key(keyToRemove.id, keyToRemove.strength, true);
     //Please notice this one is added to the trees by Id
@@ -733,6 +742,10 @@ void Team::removeContestantFromTeam(const Contestant_Key&  keyToRemove) { //Omer
             this->treeByIdSmallVal->remove(toRemoveKeyId);
             if (treeByIdSmallVal->numOfNodes == 0) {
                 updateTreeByStrengthForTrivialTreesAfterRemove();
+                if(called_from_optimal == false) {
+                    updateOptimalTeamStrength();
+                }
+
                 return;
             }
             updateTreeByStrengthSmallValForRemove();
@@ -744,6 +757,9 @@ void Team::removeContestantFromTeam(const Contestant_Key&  keyToRemove) { //Omer
             this->treeByIdSmallVal->remove(toRemoveKeyId);
             if (treeByIdSmallVal->numOfNodes == 0) {
                 updateTreeByStrengthForTrivialTreesAfterRemove();
+                if(called_from_optimal == false) {
+                    updateOptimalTeamStrength();
+                }
                 return;
             }
             updateTreeByStrengthSmallValForRemove();
@@ -755,6 +771,9 @@ void Team::removeContestantFromTeam(const Contestant_Key&  keyToRemove) { //Omer
             this->treeByIdMedVal->remove(toRemoveKeyId);
             if (treeByIdMedVal->numOfNodes == 0) {
                 updateTreeByStrengthForTrivialTreesAfterRemove();
+                if(called_from_optimal == false) {
+                    updateOptimalTeamStrength();
+                };
                 return;
             }
             updateTreeByStrengthMedValForRemove();
@@ -764,6 +783,9 @@ void Team::removeContestantFromTeam(const Contestant_Key&  keyToRemove) { //Omer
             this->treeByIdMedVal->remove(toRemoveKeyId);
             if (treeByIdMedVal->numOfNodes == 0) {
                 updateTreeByStrengthForTrivialTreesAfterRemove();
+                if(called_from_optimal == false) {
+                    updateOptimalTeamStrength();
+                }
                 return;
             }
             updateTreeByStrengthMedValForRemove();
@@ -775,6 +797,9 @@ void Team::removeContestantFromTeam(const Contestant_Key&  keyToRemove) { //Omer
             this->treeByIdBigVal->remove(toRemoveKeyId);
             if (treeByIdBigVal->numOfNodes == 0) {
                 updateTreeByStrengthForTrivialTreesAfterRemove();
+                if(called_from_optimal== false) {
+                    updateOptimalTeamStrength();
+                }
                 return;
             }
             updateTreeByStrengthBigValForRemove();
@@ -785,26 +810,68 @@ void Team::removeContestantFromTeam(const Contestant_Key&  keyToRemove) { //Omer
             this->treeByIdBigVal->remove(toRemoveKeyId);
             if (treeByIdBigVal->numOfNodes == 0) {
                 updateTreeByStrengthForTrivialTreesAfterRemove();
+                if(called_from_optimal== false) {
+                    updateOptimalTeamStrength();
+                }
                 return;
             }
             updateTreeByStrengthBigValForRemove();
 
         }
     }
+    if(called_from_optimal== false) {
+        updateOptimalTeamStrength();
+    }
     int ziv =1;
     return;
 }
 
-/*
+
 void Team::updateOptimalTeamStrength() {
     if (team_whole_contestants_by_id->numOfNodes == 0) {
         optimalTeamStrength = 0;
-    } else {
-        int counter = 0;
-        auto minNodeToDelete = team_whole_contestants_by_strength->findMin
-                    (team_whole_contestants_by_strength->root);
-        Contestant copyOfFirstDeleted = *(minNodeToDelete->getValue());
-        counter++;
-        }
+        return;
     }
-}*/
+    else {
+        if (team_whole_contestants_by_strength->numOfNodes % 3 != 0 || team_whole_contestants_by_strength->numOfNodes
+        == 3) {
+            optimalTeamStrength = 0;
+            return;
+        }
+        else {
+            auto contestant_node_MinStrength1 = team_whole_contestants_by_strength->findMin
+                            (team_whole_contestants_by_strength->root);
+            auto contestant_MinStrength1 = Contestant(*contestant_node_MinStrength1->getValue());
+            this->removeContestantFromTeam(Contestant_Key(*(contestant_node_MinStrength1->getKey())),true);
+            /*------------------------------------------------------------------------------------*/
+
+            auto contestant_node_MinStrength2 = team_whole_contestants_by_strength->findMin
+                            (team_whole_contestants_by_strength->root);
+            auto contestant_MinStrength2 =  Contestant(*contestant_node_MinStrength2->getValue());
+            this->removeContestantFromTeam(Contestant_Key(*contestant_node_MinStrength2->getKey()),true);
+            /*------------------------------------------------------------------------------------*/
+            auto contestant_node_MinStrength3 = team_whole_contestants_by_strength->findMin
+                            (team_whole_contestants_by_strength->root);
+            auto contestant_MinStrength3 = Contestant(*contestant_node_MinStrength3->getValue());
+            this->removeContestantFromTeam(Contestant_Key(*(contestant_node_MinStrength3->getKey())),true);
+            /*------------------------------------------------------------------------------------*/
+            this->optimalTeamStrength = this->maxInTreeByStrengthSmallVal.strength + this->maxInTreeByStrengthMedVal
+                    .strength +
+                                  this->maxInTreeByStrengthBigVal.strength;
+            this->addContestantToATeam(contestant_MinStrength1.get_contestantId(),
+                                       contestant_MinStrength1.get_countryId(),
+                                       contestant_MinStrength1.get_strength(), contestant_MinStrength1.get_sport(),
+                                       true);
+            this->addContestantToATeam(contestant_MinStrength2.get_contestantId(),
+                                       contestant_MinStrength2.get_countryId(),
+                                       contestant_MinStrength2.get_strength(), contestant_MinStrength2.get_sport(),
+                                       true);
+            this->addContestantToATeam(contestant_MinStrength3.get_contestantId(),
+                                       contestant_MinStrength3.get_countryId(),
+                                       contestant_MinStrength3.get_strength(), contestant_MinStrength3.get_sport(),
+                                       true);
+
+        }
+
+    }
+}

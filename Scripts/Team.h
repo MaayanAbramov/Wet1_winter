@@ -82,11 +82,12 @@ public:
     void updateTreeByStrengthSmallValForRemove(); //notice : name not correct!. this one updates both of small trees
     void updateTreeByStrengthMedValForRemove();//notice : name not correct!. this one updates both of med trees
     void updateTreeByStrengthBigValForRemove(); //notice : name not correct!. this one updates both of big trees
-    void addContestantToATeam(int contestantId, int countryId, int strength, Sport sport);
+    void addContestantToATeam(int contestantId, int countryId, int strength, Sport sport, bool called_from_optimal);
 
-    void removeContestantFromTeam(const Contestant_Key & keyToRemove); //toRemove should be contestant with flag 0
+    void removeContestantFromTeam(const Contestant_Key & keyToRemove, bool called_from_optimal); //toRemove should be
+    // contestant with flag 0
     void updateTreeByStrengthForTrivialTreesAfterRemove();
-    //void updateOptimalTeamStrength();
+    void updateOptimalTeamStrength();
     // about the Contestant
     Contestant_Key get_maxInTreeByStrengthBigVal();
     Contestant_Key get_maxInTreeByStrengthMedVal();

@@ -373,7 +373,9 @@ template <class Key, class Value>
 void AvlTree<Key, Value>::recursive_insert(Node* curr_node, const Key& key, const
 Value& value, bool* createdAlready) {
     if (*(curr_node->getKey()) == key && !*createdAlready) {
+        cout << "check" << endl;
         throw invalid_argument("the key already exists");
+
     }
     if (key < *(curr_node->getKey()) && curr_node->left == nullptr) {
         numOfNodes++;
