@@ -8,12 +8,13 @@ int main() {
 
     Team* team = new Team(1, Sport::ACROBATICS, 0, 123); // Example values for teamId, sport, numParticipants, and
 
-    for (int i = 0; i <= 5000 ; ++i) {
+    /*for (int i = 0; i <= 10 ; ++i) {
         team->addContestantToATeam(i, 123, i, Sport::ACROBATICS);
     }
-    for(int i = 0 ; i <= 5000; i++){
+    for(int i = 0 ; i <= 5; i++){
         team->removeContestantFromTeam(Contestant_Key(i,i,false));
-    }
+    }*/
+    team->addContestantToATeam(2, 123, 2, Sport::ACROBATICS);
 //    team->addContestantToATeam(10, 123, 3, Sport::ACROBATICS);
 //    team->addContestantToATeam(13, 123, 6, Sport::ACROBATICS);
 //    team->addContestantToATeam(15, 123, 9, Sport::ACROBATICS);
@@ -52,6 +53,14 @@ int main() {
     for (int i = 0 ; i < 3 ; i++) {
         cout << "#updateStateOfBalance " << team->getStateOfBalanceForRemove(i) <<endl;
     }
-    cout << "hello" << endl;
+    team->removeContestantFromTeam(Contestant_Key(2,2,false));
+    cout << "--------------------------after removing---------------------------" << endl;
+    for (int i = 0 ; i < 3 ; i++) {
+        cout << "#updateStateOfBalance " << team->getStateOfBalanceForAdd(i) <<endl;
+    }
+    cout << "#remove status array" << endl;
+    for (int i = 0 ; i < 3 ; i++) {
+        cout << "#updateStateOfBalance " << team->getStateOfBalanceForRemove(i) <<endl;
+    }
     return 0;
 }

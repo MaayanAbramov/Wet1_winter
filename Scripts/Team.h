@@ -46,13 +46,6 @@ class Team {
     AvlTree<Contestant_Key, Contestant>* treeByStrengthSmallVal;
     int stateOfBalanceForAdd[3];
     int stateOfBalanceForRemove[3];
-    Contestant* contestantWithMaxInTreeByIdBigVal;
-    Contestant* contestantWithMaxInTreeByIdMedVal;
-    Contestant* contestantWithMaxInTreeByIdSmallVal;
-
-    Contestant* contestantWithMinInTreeByIdBigVal;
-    Contestant* contestantWithMinInTreeByIdMedVal;
-    Contestant* contestantWithMinInTreeByIdSmallVal;
 
     Contestant_Key maxInTreeByIdBigVal;
     Contestant_Key maxInTreeByIdMedVal;
@@ -92,6 +85,7 @@ public:
     void addContestantToATeam(int contestantId, int countryId, int strength, Sport sport);
 
     void removeContestantFromTeam(const Contestant_Key & keyToRemove); //toRemove should be contestant with flag 0
+    void updateTreeByStrengthForTrivialTreesAfterRemove();
     //void updateOptimalTeamStrength();
     // about the Contestant
     Contestant_Key get_maxInTreeByStrengthBigVal();
