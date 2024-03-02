@@ -11,17 +11,20 @@ Contestant::Contestant() {
     this->strength = -2;
     this->sport = Sport::BOULDERING;
     this->is_by_strength_sorted = 0;
-    for (int i = 0 ; i < 3 ; i++) {
-        teamsIParticipate[i] = static_cast<Sport>(TEAM_TYPE_INIT);
+    for (int i = 0 ; i < NUM_OF_MAX_TEAMS ; i++) {
+        this->teamsIParticipate[i] = -2;
     }
-}
 
+}
 Contestant::Contestant(int contestantId, int countryId, int strength, Sport sport, bool is_by_strength_sorted_) {
     this->contestantId = contestantId;
     this->countryId = countryId;
     this->strength = strength;
     this->sport = sport;
     this->is_by_strength_sorted = is_by_strength_sorted_;
+    for (int i = 0 ; i < NUM_OF_MAX_TEAMS ; i++) {
+        this->teamsIParticipate[i] = -2;
+    }
 }
 Contestant::Contestant(const Contestant& other) {
     this->contestantId = other.contestantId;
@@ -29,6 +32,9 @@ Contestant::Contestant(const Contestant& other) {
     this->strength = other.strength;
     this->sport = other.sport;
     this->is_by_strength_sorted = other.is_by_strength_sorted;
+    for (int i = 0 ; i < 3 ; i++) {
+        teamsIParticipate[i] = other.teamsIParticipate[i];
+    }
 }
 bool Contestant::operator==(const Contestant& other) const {
     assert(false);
@@ -88,9 +94,12 @@ void Contestant::set_is_by_strength_sorted(bool is_by_strength) {
     this->is_by_strength_sorted = is_by_strength;
 }
 
-Sport* Contestant::get_teamsIParticipate(int index) const {
-    return &(this->teamsIParticipate[index]);
+int Contestant::get_teamsIParticipate(int index) const {
+    return (this->teamsIParticipate[index]);
 }
-void Contestant::set_teamsIparticipate(int index, const Sport& sport) {
-    this->teamsIParticipate[index] = sport;
+void Contestant::set_teamsIparticipate(int index, int teamId) {
+    this->teamsIParticipate[index] = teamId;
+}
+void Contestant::set_change_strength(int change) {
+    this->strength = this->strength + change;
 }

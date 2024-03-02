@@ -6,16 +6,16 @@
 
 int main() {
 
-    Team* team = new Team(1, Sport::ACROBATICS, 0, 123); // Example values for teamId, sport, numParticipants, and
+    Team* team = new Team(1, Sport::ACROBATICS, 123); // Example values for teamId, sport, numParticipants, and
     /*for (int i = 0; i <= 10 ; ++i) {
         team->addContestantToATeam(i, 123, i, Sport::ACROBATICS);
     }
     for(int i = 0 ; i <= 5; i++){
         team->removeContestantFromTeam(Contestant_Key(i,i,false));
     }*/
-    for (int i = 0; i <900 ; ++i) {
-        team->addContestantToATeam(i,123,i,Sport::ACROBATICS, false);
-    }
+//    for (int i = 0; i <900 ; ++i) {
+//        team->addContestantToATeam(i,123,i,Sport::ACROBATICS, false);
+//    }
     for(int i = 0; i< 900 ; i++){
         team->removeContestantFromTeam(Contestant_Key(i,i,false),false);
         cout << "the optimal strength is "<<team->get_optimalTeamStrength() << endl;

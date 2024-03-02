@@ -28,6 +28,7 @@ public:
     }
 };
 class Team {
+
     int teamId;
     Sport sport;
     int numParticipants;
@@ -61,9 +62,11 @@ class Team {
     int optimalTeamStrength; //the max strength of a team after deleting the three "weakest" members
 public:
     Team();
-    Team(int teamId, Sport sport, int numParticipants, int countryId);
+    Team(int teamId, Sport sport, int countryId);
     ~Team();
     int getCountryId() const;
+    Sport* getSport();
+    int getNumParticipants() const;
     int getStateOfBalanceForAdd(int index);
     void updateStateOfBalanceForAdd();
     int getStateOfBalanceForRemove(int index);
@@ -82,13 +85,16 @@ public:
     void updateTreeByStrengthSmallValForRemove(); //notice : name not correct!. this one updates both of small trees
     void updateTreeByStrengthMedValForRemove();//notice : name not correct!. this one updates both of med trees
     void updateTreeByStrengthBigValForRemove(); //notice : name not correct!. this one updates both of big trees
-    void addContestantToATeam(int contestantId, int countryId, int strength, Sport sport, bool called_from_optimal);
-
+    //void addContestantToATeam(int contestantId, int countryId, int strength, Sport sport, bool called_from_optimal);
+    void addContestantToATeam(const Contestant_Key&  keyToAdd, Contestant* contestantToAdd, bool
+    called_from_optimal);
     void removeContestantFromTeam(const Contestant_Key & keyToRemove, bool called_from_optimal); //toRemove should be
     // contestant with flag 0
     void updateTreeByStrengthForTrivialTreesAfterRemove();
     void updateOptimalTeamStrength();
     // about the Contestant
+    //updates the contestant's teams-array in index arrayIndex in this specific team, to teamID
+    void update_contestant_team_array(int contestantId, int arrayIndex, int teamId);
     Contestant_Key get_maxInTreeByStrengthBigVal();
     Contestant_Key get_maxInTreeByStrengthMedVal();
     Contestant_Key get_maxInTreeByStrengthSmallVal();

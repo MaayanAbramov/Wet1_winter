@@ -34,13 +34,15 @@ public:
 class Country {
     int countryId;
     int medals;
-    AvlTree<Contestant_Key, Contestant>* Contestants;
-    AvlTree<Team_Key, Team>* Teams;
+    AvlTree<Contestant_Key, Contestant>* country_contestants;
+    AvlTree<Team_Key, Team>* country_teams;
 public:
     Country();
     Country(int countryId, int medals);
-    AvlTree<Team_Key, Team>* getTeams();
-    AvlTree<Team_Key, Contestant>* getContestants();
+    AvlTree<Team_Key, Team>* getCountryTeams();
+    AvlTree<Contestant_Key, Contestant>* getCountryContestants();
+    int getMedals();
+    void IncMedalCountByOne();
 };
 
 #endif //WINTERAVLTREE_COUNTRY_H

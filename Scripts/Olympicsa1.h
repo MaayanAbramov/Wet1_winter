@@ -20,14 +20,15 @@
 #include "Team.h"
 #include "Contestant.h"
 #include "Country.h"
+#define NUM_OF_MAX_TEAMS 3
 
 
 class Olympics {
 private:
-    AvlTree<int, Team>* teams;
-    AvlTree<int, Contestant>* contestants;
-    AvlTree<int, Country>* countries;
-
+    AvlTree<Team_Key, Team>* teams;
+    AvlTree<Contestant_Key, Contestant>* contestants;
+    AvlTree<Country_Key, Country>* countries;
+    bool compare_country_ids_and_sports(int,int);
 public:
     // <DO-NOT-MODIFY> {
 
