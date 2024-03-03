@@ -382,23 +382,29 @@ output_t<int> Olympics::get_medals(int countryId){
 }
 
 output_t<int> Olympics::get_team_strength(int teamId){
-    if (teamId <= 0) {
-        return output_t<int>(StatusType::INVALID_INPUT);
+    try {
+        if (teamId <= 0) {
+            return output_t<int>(StatusType::INVALID_INPUT);
+        }
+        auto node = this->teams->find(Team_Key(teamId),this->teams->root);
+        if (node == nullptr) {
+            return output_t<int>(StatusType::FAILURE);
+        }
+        auto team = this->teams->find(Team_Key(teamId),this->teams->root)->getValue();
+        if (team->getNumParticipants()%3==0)
+        {
+            return output_t<int>(team->get_maxInTreeByStrengthSmallVal().strength + team->get_maxInTreeByStrengthMedVal()
+                    .strength +
+                                 team->get_maxInTreeByStrengthBigVal().strength);
+        }
+        else {
+            return output_t<int>(0);
+        }
     }
-    auto node = this->teams->find(Team_Key(teamId),this->teams->root);
-    if (node == nullptr) {
-        return output_t<int>(StatusType::FAILURE);
+    catch(...) {//std::bad_alloc& ba, remember to change it
+        return output_t<int>(StatusType::ALLOCATION_ERROR);
     }
-    auto team = this->teams->find(Team_Key(teamId),this->teams->root)->getValue();
-    if (team->getNumParticipants()%3==0)
-    {
-        return output_t<int>(team->get_maxInTreeByStrengthSmallVal().strength + team->get_maxInTreeByStrengthMedVal()
-        .strength +
-        team->get_maxInTreeByStrengthBigVal().strength);
-    }
-    else {
-        return output_t<int>(0);
-    }
+
 }
 
 StatusType Olympics::unite_teams(int teamId1,int teamId2){
@@ -426,21 +432,37 @@ StatusType Olympics::unite_teams(int teamId1,int teamId2){
         while(isTeamTwoFound->getValue()->getNumParticipants()!=0){
             auto team2_min_node = isTeamTwoFound->getValue()->get_team_whole_contestants_by_id()->findMin
                     (isTeamTwoFound->getValue()->get_team_whole_contestants_by_id()->root);
-            Contestant team2_min_contestant = Contestant(*team2_min_node->getValue());
-            Contestant_Key team2_min_Key = Contestant_Key(*team2_min_node->getKey());
+            Contestant team2_min_contestant = *team2_min_node->getValue();
+            Contestant_Key team2_min_Key = *team2_min_node->getKey();
+            //if team2 contestnt does not exist already in team1, add him to team1
             if(isTeamOneFound->getValue()->get_team_whole_contestants_by_id()->find(team2_min_Key,
                                                                                     isTeamOneFound->getValue()->get_team_whole_contestants_by_id()->root)==nullptr) {
                 isTeamTwoFound->getValue()->removeContestantFromTeam(team2_min_Key, false);
                 isTeamOneFound->getValue()->addContestantToATeam(team2_min_Key, &team2_min_contestant, false);
-                //now do the same for team 1 and teams 2 in olympicsa->teams tree
-                auto team2_min_node_from_teams = teamToAddTo2->getValue()->get_team_whole_contestants_by_id()->findMin
-                        (teamToAddTo2->getValue()->get_team_whole_contestants_by_id()->root);
-
-                Contestant team2_min_contestant_from_teams = Contestant(*team2_min_node_from_teams->getValue());
-                Contestant_Key team2_min_Key_from_teams = Contestant_Key(*team2_min_node_from_teams->getKey());
-                isTeamTwoFound->getValue()->removeContestantFromTeam(team2_min_Key_from_teams, false);
-                isTeamOneFound->getValue()->addContestantToATeam(team2_min_Key_from_teams,
-                                                                 &team2_min_contestant_from_teams, false);
+                //------------------------now do the same for team 1 and teams 2 in CountryTeeams---------------------*/
+                Country_Key countryKey  = Country_Key(countryIdOf2); //remember country 1 and country 2 are the same,
+                // otherwise, failure
+                auto node_of_country = countries->find(countryKey, countries->root);
+                assert(node_of_country != nullptr);
+                auto country_teams = node_of_country->getValue()->getCountryTeams();
+                auto team2_in_country = country_teams->find(keyOfTeamToAddTo2, country_teams->root);
+                auto team1_in_country = country_teams->find(keyOfTeamToAddTo1, country_teams->root);
+                assert(team1_in_country != nullptr && team2_in_country != nullptr);
+                auto min_in_team2_of_country = team2_in_country->getValue()->get_team_whole_contestants_by_id()
+                        ->findMin(team2_in_country->getValue()->get_team_whole_contestants_by_id()->root);
+                auto key_of_min_in_team2_of_country = *(min_in_team2_of_country->getKey());
+                /*----------------------if team2 contestant does not exist alreadt in team1, add him to team1---------*/
+                if (team1_in_country->getValue()->get_team_whole_contestants_by_id()->find
+                        (key_of_min_in_team2_of_country, team1_in_country->getValue()->get_team_whole_contestants_by_id()
+                                ->root) == nullptr) { //must be true always because this is a copy the if above
+                    auto contestant_of_min_in_team2_of_country = min_in_team2_of_country->getValue();
+                    team2_in_country->getValue()->removeContestantFromTeam(key_of_min_in_team2_of_country, false);
+                    team1_in_country->getValue()->addContestantToATeam(key_of_min_in_team2_of_country,
+                                                                       contestant_of_min_in_team2_of_country, false);
+                }
+            }
+            else {
+                continue;
             }
 
         }
@@ -449,15 +471,13 @@ StatusType Olympics::unite_teams(int teamId1,int teamId2){
     catch(...) {//std::bad_alloc& ba, remember to change it
         return StatusType::ALLOCATION_ERROR;
     }
-
-
-
+    return StatusType::SUCCESS;
 }
 
 StatusType Olympics::play_match(int teamId1,int teamId2){
     try {
         if (teamId1 <= 0 || teamId2 <= 0 || teamId1 == teamId2) {
-            return StatusType::FAILURE;
+            return StatusType::INVALID_INPUT;
         }
         auto isTeamOneFound = teams->find(Team_Key(teamId1), teams->root);
         auto isTeamTwoFound = teams->find(Team_Key(teamId2), teams->root);
@@ -483,14 +503,14 @@ StatusType Olympics::play_match(int teamId1,int teamId2){
         if (*sportOf1 != *sportOf2) {
             return StatusType::FAILURE;
         }
-        int nikood_team_1=this->get_strength(teamId1).ans()+country1->getMedals();
-        int nikood_team_2=this->get_strength(teamId2).ans()+country2->getMedals();
-        if(nikood_team_1==nikood_team_2){
+        int nikood_team_1=this->get_strength(teamId1).ans() + country1->getMedals();
+        int nikood_team_2=this->get_strength(teamId2).ans() + country2->getMedals();
+        if(nikood_team_1 == nikood_team_2){
             //if equal, dont do anything, but return success(ki ze teko)
             return StatusType::SUCCESS;
         }
         else{
-            nikood_team_1>nikood_team_2?country1->IncMedalCountByOne():country2->IncMedalCountByOne();
+            nikood_team_1 > nikood_team_2 ? country1->IncMedalCountByOne() : country2->IncMedalCountByOne();
             return StatusType::SUCCESS;
         }
     }
@@ -501,7 +521,25 @@ StatusType Olympics::play_match(int teamId1,int teamId2){
 }
 
 output_t<int> Olympics::austerity_measures(int teamId){
-    return this->teams->find(Team_Key(teamId),this->teams->root)->getValue()->get_optimalTeamStrength();
+    if (teamId <= 0) {
+        return StatusType::INVALID_INPUT;
+    }
+    Team_Key teamKey = Team_Key(teamId);
+    auto is_team_found = teams->find(teamKey, teams->root);
+    if (is_team_found == nullptr) {
+        return output_t<int>(StatusType::FAILURE);
+    }
+    if (is_team_found->getValue()->get_team_whole_contestants_by_id()->numOfNodes < 3) {
+        return output_t<int>(StatusType::FAILURE);
+    }
+    int res = 0;
+    try {
+        res = is_team_found->getValue()->get_optimalTeamStrength();
+    }
+    catch(...) {//std::bad_alloc& ba, remember to change it
+        return StatusType::ALLOCATION_ERROR;
+    }
+    return output_t<int>(res);
 }
 
 

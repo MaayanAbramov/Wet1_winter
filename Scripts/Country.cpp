@@ -22,5 +22,5 @@ int Country:: getMedals(){
     return  this->medals;
 }
 void Country::IncMedalCountByOne(){
-    this->medals+=1;
+    this->medals += 1;
 }
