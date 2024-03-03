@@ -20,6 +20,9 @@
 #include "Team.h"
 #include "Contestant.h"
 #include "Country.h"
+#include "Team_Key.h"
+#include "Contestant_Key.h"
+#include "Country_Key.h"
 #define NUM_OF_MAX_TEAMS 3
 
 

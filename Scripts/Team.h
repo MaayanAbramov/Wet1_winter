@@ -7,28 +7,11 @@
 
 #include "wet1util.h"
 #include "AvlTree.h"
+#include "Contestant_Key.h"
 #include "Contestant.h"
 
-class Team_Key{
-    int id;
-public:
-    explicit Team_Key(int id=-1): id(id) {
-        assert(this->id!=-1);
-    }
-    Team_Key(const Team_Key& key) =default;
-    ~Team_Key()=default;
-    friend bool operator<(const Team_Key& key1, const Team_Key& key2){
-        return key1.id < key2.id;
-    }
-    friend bool operator>(const Team_Key& key1, const Team_Key& key2){
-        return key1.id > key2.id;
-    }
-    bool operator==(const Team_Key& key2){
-        return this->id == key2.id;
-    }
-};
-class Team {
 
+class Team {
     int teamId;
     Sport sport;
     int numParticipants;

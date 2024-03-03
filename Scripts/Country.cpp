@@ -11,6 +11,7 @@ Country::Country(int countryId, int medals) {
     this->country_teams = new AvlTree<Team_Key, Team>();
 }
 
+
 AvlTree<Contestant_Key, Contestant>* Country::getCountryContestants() {
     return this->country_contestants;
 }
@@ -23,4 +24,12 @@ int Country:: getMedals(){
 }
 void Country::IncMedalCountByOne(){
     this->medals += 1;
+}
+
+Country::~Country() {
+    delete this->country_contestants;
+    this->country_contestants=nullptr;
+    delete this->country_teams;
+    this->country_teams=nullptr;
+
 }
