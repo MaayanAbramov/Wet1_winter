@@ -408,12 +408,14 @@ void Team::addContestantToATeam(const Contestant_Key&  keyToAdd, Contestant* toA
 called_from_optimal) {
     //Please Notice this one is added to the trees by strength
     //Contestant toAdd = Contestant(contestantId, countryId, strength, sport, true);
-    int index = 0;
+    int index = -1;
     for (int i = 0 ; i < NUM_OF_MAX_TEAMS ; i++) {
-        if (toAdd->get_teamsIParticipate(i) != -2) {
-            index++;
+        if (toAdd->get_teamsIParticipate(i) == -2) {
+            index=i;
+            break;
         }
     }
+
     toAdd->set_teamsIparticipate(index, this->teamId);
     Contestant_Key toAddKeyStr = Contestant_Key(keyToAdd.id, keyToAdd.strength, true);
     //Please notice this one is added to the trees by Id
@@ -485,13 +487,28 @@ called_from_optimal) {
 void Team::update_contestant_team_array(int contestantId, int arrayIndex, int teamId){ //better to call this function
     // insert and remove
     Contestant_Key contestantKey = Contestant_Key(contestantId,-2, false);
-    auto Copy_node = (this->get_team_whole_contestants_by_id()->find
-            (contestantKey,this->get_team_whole_contestants_by_id()->root));
-    Contestant Copy = Contestant(*(*(Copy_node->getValue())));
-    auto Copy_key = *(Copy_node->getKey());
-    Copy.set_teamsIparticipate(arrayIndex, teamId);
-    this->removeContestantFromTeam(Copy_key, false);
-    this->addContestantToATeam(Copy_key, &Copy, false);
+    auto whole_id = (this->get_team_whole_contestants_by_id()->find(contestantKey,this->get_team_whole_contestants_by_id()->root));
+    Contestant_Key contestantKeyStr = Contestant_Key(contestantId,whole_id->value->get_strength(), true);
+    auto whole_str = (this->get_team_whole_contestants_by_strength()->find(contestantKeyStr,
+                                                                   this->get_team_whole_contestants_by_strength()->root));
+    AvlTree<Contestant_Key,Contestant*> *tree_to_find_id, *tree_to_find_str;
+    if( contestantId <= this->maxInTreeByIdSmallVal.id){
+        tree_to_find_id = this->treeByIdSmallVal;
+        tree_to_find_str = this->treeByStrengthSmallVal;
+    }
+    else if( contestantId <= this->maxInTreeByIdMedVal.id){
+            tree_to_find_id = this->treeByIdMedVal;
+            tree_to_find_str = this->treeByStrengthMedVal;
+        }
+    else{
+        tree_to_find_id = this->treeByIdBigVal;
+        tree_to_find_str = this->treeByStrengthBigVal;
+        }
+    whole_id->value->set_teamsIparticipate(arrayIndex,teamId);
+    whole_str->value->set_teamsIparticipate(arrayIndex,teamId);
+    tree_to_find_id->find(contestantKey,tree_to_find_id->root)->value->set_teamsIparticipate(arrayIndex,teamId);
+    tree_to_find_str->find(contestantKeyStr,tree_to_find_str->root)->value->set_teamsIparticipate(arrayIndex,teamId);
+
 }
 /*
 void Team::addContestantToATeam(int contestantId, int countryId, int strength, Sport sport, bool called_from_optimal) {

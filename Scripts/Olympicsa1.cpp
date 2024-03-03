@@ -70,15 +70,17 @@ StatusType Olympics::add_team(int teamId,int countryId,Sport sport){
         return StatusType::FAILURE; //meaning if the team already existed or the country is not existing
     }
     try {
-        Team* toAdd = new Team(teamId, sport, countryId); //numParticipant = 0
-        teams->insertAux(keyToAdd, toAdd);
+        Team* toAddtoCountry = new Team(teamId, sport, countryId); //numParticipant = 0
+        Team* toAddtoteams = new Team(teamId, sport, countryId);
+
         auto nodeOfCountry = countries->find(keyToCountry, countries->root);
         if (nodeOfCountry == nullptr) {
-            delete toAdd;
+            delete toAddtoteams;
+            delete toAddtoCountry;
             return StatusType::FAILURE;
         }
-        auto ptrToTeamForInsert = teams->find(keyToAdd, teams->root);
-        nodeOfCountry->value->getCountryTeams()->insertAux(keyToAdd, *(ptrToTeamForInsert->getValue()));
+        teams->insertAux(keyToAdd, toAddtoteams);
+        nodeOfCountry->value->getCountryTeams()->insertAux(keyToAdd, toAddtoCountry);
         return StatusType::SUCCESS;
     }
     catch(...) {//std::bad_alloc& ba, remember to change it
@@ -153,8 +155,15 @@ StatusType Olympics::remove_contestant(int contestantId){
             }
         }
         Country_Key countryKey = Country_Key(isContestantFound->value->get_countryId());
+        auto country = countries->find(countryKey, countries->root)->value;
+        Contestant* to_delete_country = country->getCountryContestants()->find(isContestantFound->key,
+                                                                         country->getCountryContestants()
+                ->root)->value;
+        Contestant* to_delete_contestant = isContestantFound->value;
         (*countries->find(countryKey, countries->root)->getValue())->getCountryContestants()->remove(contestantKeyId);
         contestants->remove(contestantKeyId);
+        delete to_delete_contestant;
+        delete to_delete_country;
     }
     catch(...) {//std::bad_alloc& ba, remember to change it
         return StatusType::ALLOCATION_ERROR;
@@ -165,7 +174,7 @@ StatusType Olympics::remove_contestant(int contestantId){
 bool Olympics::compare_country_ids_and_sports(int teamId, int contestantId){
     Contestant_Key contestantKeyToFind = Contestant_Key(contestantId, -2, false);
     auto contestantToAddToTeam = contestants->find(contestantKeyToFind, contestants->root);
-    Contestant_Key contestantKey = *(contestantToAddToTeam->getKey());
+    //Contestant_Key contestantKey = *(contestantToAddToTeam->getKey());
     int countryIdOfContestant = contestantToAddToTeam->value->get_countryId();
     Team_Key keyOfTeamToAddTo = Team_Key(teamId);
     auto teamToAddTo = teams->find(keyOfTeamToAddTo, teams->root);
@@ -202,6 +211,7 @@ StatusType Olympics::add_contestant_to_team(int teamId,int contestantId){
         }
         if (contestantToAddToTeam->value->get_teamsIParticipate(i) == -2 && first_empty_index == -1) {
             first_empty_index =i;
+            break;
         }
     }
     if (first_empty_index == -1) {
@@ -226,7 +236,7 @@ StatusType Olympics::add_contestant_to_team(int teamId,int contestantId){
         for (int i = 0 ; i < NUM_OF_MAX_TEAMS  ; i++){
 
             int pastTeamId = contestantToAddToTeam->value->get_teamsIParticipate(i);
-            if (pastTeamId == -2)
+            if (pastTeamId == -2 || i == first_empty_index)
             {
                 continue;
             }
@@ -280,9 +290,13 @@ StatusType Olympics::remove_contestant_from_team(int teamId,int contestantId){
         team_to_remove_from_in_country->value->removeContestantFromTeam(contestantKey,false);
         isTeamFound->value->removeContestantFromTeam(contestantKey,false);
         int index_to_update = -1;
-        for (int i = 0; i < NUM_OF_MAX_TEAMS; ++i) {
+        for (int i = 0; i < NUM_OF_MAX_TEAMS; i++) {
+            if(contestantToFind->value->get_teamsIParticipate(i) == -2 ){
+                continue;
+            }
             if(contestantToFind->value->get_teamsIParticipate(i)==teamId){
                 index_to_update = i;
+                break;
             }
         }
         assert(index_to_update != -1);
