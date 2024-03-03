@@ -7,16 +7,16 @@
 Country::Country(int countryId, int medals) {
     this->countryId = countryId;
     this->medals = medals;
-    this->country_contestants = new AvlTree<Contestant_Key, Contestant>();
-    this->country_teams = new AvlTree<Team_Key, Team>();
+    this->country_contestants = new AvlTree<Contestant_Key, Contestant*>();
+    this->country_teams = new AvlTree<Team_Key, Team*>();
 }
 
 
-AvlTree<Contestant_Key, Contestant>* Country::getCountryContestants() {
+AvlTree<Contestant_Key, Contestant*>* Country::getCountryContestants() {
     return this->country_contestants;
 }
 
-AvlTree<Team_Key, Team>* Country::getCountryTeams() {
+AvlTree<Team_Key, Team*>* Country::getCountryTeams() {
     return this->country_teams;
 }
 int Country:: getMedals(){

@@ -3,9 +3,9 @@
 
 
 Olympics::Olympics()  {
-    this->teams = new AvlTree<Team_Key, Team>();
-    this->contestants = new AvlTree<Contestant_Key, Contestant>();
-    this->countries = new AvlTree<Country_Key, Country>();
+    this->teams = new AvlTree<Team_Key, Team*>();
+    this->contestants = new AvlTree<Contestant_Key, Contestant*>();
+    this->countries = new AvlTree<Country_Key, Country*>();
 }
 
 Olympics::~Olympics(){
@@ -27,8 +27,7 @@ StatusType Olympics::add_country(int countryId, int medals){
 
     try {
 
-        Country country1 =  Country(countryId, medals);
-
+        Country* country1 = new Country(countryId, medals);
         countries->insertAux(countryKey, country1);
         return StatusType::SUCCESS;
     }
@@ -44,14 +43,16 @@ StatusType Olympics::remove_country(int countryId){
     auto node = countries->find(countryKey, countries->root);
     if (node == nullptr)
         return StatusType::FAILURE;
-    if (node->getValue()->getCountryContestants()->numOfNodes != 0 || node->getValue()->getCountryTeams()->numOfNodes
-    != 0) {
+    Country* country = *(node->getValue());
+    if (country->getCountryContestants()->numOfNodes != 0 || country->getCountryTeams()->numOfNodes!= 0) {
         return StatusType::FAILURE; //meaning if there exists at least one contestant or one team, the country is not
         // empty, which leads to failure
     }
 
     try {
+        auto to_delete = *(countries->find(countryKey,countries->root)->getValue());
         countries->remove(countryKey);
+        delete to_delete;
     }
     catch (...){//std::bad_alloc& ba, remember to change it
         return StatusType::ALLOCATION_ERROR;
@@ -69,14 +70,15 @@ StatusType Olympics::add_team(int teamId,int countryId,Sport sport){
         return StatusType::FAILURE; //meaning if the team already existed or the country is not existing
     }
     try {
-        Team toAdd = Team(teamId, sport, countryId); //numParticipant = 0
+        Team* toAdd = new Team(teamId, sport, countryId); //numParticipant = 0
         teams->insertAux(keyToAdd, toAdd);
-        AvlTree<Country_Key, Country>::Node* nodeOfCountry = countries->find(keyToCountry, countries->root);
+        auto nodeOfCountry = countries->find(keyToCountry, countries->root);
         if (nodeOfCountry == nullptr) {
+            delete toAdd;
             return StatusType::FAILURE;
         }
         auto ptrToTeamForInsert = teams->find(keyToAdd, teams->root);
-        nodeOfCountry->value.getCountryTeams()->insertAux(keyToAdd, *(ptrToTeamForInsert->getValue()));
+        nodeOfCountry->value->getCountryTeams()->insertAux(keyToAdd, *(ptrToTeamForInsert->getValue()));
         return StatusType::SUCCESS;
     }
     catch(...) {//std::bad_alloc& ba, remember to change it
@@ -89,16 +91,18 @@ StatusType Olympics::remove_team(int teamId){ //remember there are more teams th
     if (teamId <= 0) {
         return StatusType::INVALID_INPUT;
     }
-    Team_Key teamKey = Team_Key(teamId);
+    Team_Key teamKey =  Team_Key(teamId);
     auto toRemove = teams->find(teamKey, teams->root);
-    if ( toRemove == nullptr || toRemove->getValue()->get_team_whole_contestants_by_id()->numOfNodes != 0) {
+    if ( toRemove == nullptr || toRemove->value->get_team_whole_contestants_by_id()->numOfNodes != 0) {
         return StatusType::FAILURE;
     }
     try {
-        Country_Key countryKey = Country_Key(toRemove->value.getCountryId());
+        Country_Key countryKey = Country_Key(toRemove->value->getCountryId());
         auto nodeOfCountry = countries->find(countryKey, countries->root);
-        nodeOfCountry->getValue()->getCountryTeams()->remove(teamKey);
+        (*(nodeOfCountry->getValue()))->getCountryTeams()->remove(teamKey);
+        Team* to_delete = teams->find(teamKey,teams->root)->value;
         teams->remove(teamKey);
+        delete to_delete;
     }
     catch(...) {//std::bad_alloc& ba, remember to change it
         return StatusType::ALLOCATION_ERROR;
@@ -121,9 +125,11 @@ StatusType Olympics::add_contestant(int contestantId ,int countryId,Sport sport,
         if (isCountryFound == nullptr) {
             return StatusType::FAILURE;
         }
-        Contestant toAdd = Contestant(contestantId, countryId, strength, sport, false); //the bool does not matter
-        contestants->insertAux(contestantKey, toAdd);
-        isCountryFound->getValue()->getCountryContestants()->insertAux(contestantKey, toAdd);
+        Contestant* Contestant_toAddcontestants = new Contestant(contestantId, countryId, strength, sport, false);
+        //the bool does not matter
+        Contestant* Contestant_toAddCountry = new Contestant(contestantId, countryId, strength, sport, false);
+        contestants->insertAux(contestantKey, Contestant_toAddcontestants);
+        (*isCountryFound->getValue())->getCountryContestants()->insertAux(contestantKey, Contestant_toAddCountry);
     }
     catch(...) {//std::bad_alloc& ba, remember to change it
         return StatusType::ALLOCATION_ERROR;
@@ -142,12 +148,12 @@ StatusType Olympics::remove_contestant(int contestantId){
             return StatusType::FAILURE;
         }
         for (int i = 0 ; i < 3 ; i++) {
-            if (isContestantFound->getValue()->get_teamsIParticipate(i) != -2) {
+            if (isContestantFound->value->get_teamsIParticipate(i) != -2) {
                 return StatusType::FAILURE;
             }
         }
-        Country_Key countryKey = Country_Key(isContestantFound->getValue()->get_countryId());
-        countries->find(countryKey, countries->root)->getValue()->getCountryContestants()->remove(contestantKeyId);
+        Country_Key countryKey = Country_Key(isContestantFound->value->get_countryId());
+        (*countries->find(countryKey, countries->root)->getValue())->getCountryContestants()->remove(contestantKeyId);
         contestants->remove(contestantKeyId);
     }
     catch(...) {//std::bad_alloc& ba, remember to change it
@@ -160,12 +166,12 @@ bool Olympics::compare_country_ids_and_sports(int teamId, int contestantId){
     Contestant_Key contestantKeyToFind = Contestant_Key(contestantId, -2, false);
     auto contestantToAddToTeam = contestants->find(contestantKeyToFind, contestants->root);
     Contestant_Key contestantKey = *(contestantToAddToTeam->getKey());
-    int countryIdOfContestant = contestantToAddToTeam->getValue()->get_countryId();
+    int countryIdOfContestant = contestantToAddToTeam->value->get_countryId();
     Team_Key keyOfTeamToAddTo = Team_Key(teamId);
     auto teamToAddTo = teams->find(keyOfTeamToAddTo, teams->root);
-    int countryIdOfTeamToAddTo = teamToAddTo->getValue()->getCountryId();
-    Sport contestantSport = contestantToAddToTeam->getValue()->get_sport();
-    Sport teamSport = *(teamToAddTo->getValue()->getSport());
+    int countryIdOfTeamToAddTo = teamToAddTo->value->getCountryId();
+    Sport contestantSport = contestantToAddToTeam->value->get_sport();
+    Sport teamSport = *(teamToAddTo->value->getSport());
     return countryIdOfContestant == countryIdOfTeamToAddTo && teamSport == contestantSport;
 }
 
@@ -185,16 +191,16 @@ StatusType Olympics::add_contestant_to_team(int teamId,int contestantId){
     int first_empty_index = -1;
     Contestant_Key contestantKeyToFind = Contestant_Key(contestantId, -2, false);
     auto contestantToAddToTeam = contestants->find(contestantKeyToFind, contestants->root);
-    int countryIdOfContestant = contestantToAddToTeam->getValue()->get_countryId();
+    int countryIdOfContestant = contestantToAddToTeam->value->get_countryId();
     Team_Key keyOfTeamToAddTo = Team_Key(teamId);
     auto teamToAddTo = teams->find(keyOfTeamToAddTo, teams->root);
-    int countryIdOfTeamToAddTo = teamToAddTo->getValue()->getCountryId();
+    int countryIdOfTeamToAddTo = teamToAddTo->value->getCountryId();
     Contestant_Key contestantKey = *(contestantToAddToTeam->getKey());
     for (int i = 0; i < NUM_OF_MAX_TEAMS; i++) {
-        if(contestantToAddToTeam->getValue()->get_teamsIParticipate(i) == teamId) {
+        if(contestantToAddToTeam->value->get_teamsIParticipate(i) == teamId) {
             return StatusType::FAILURE;
         }
-        if (contestantToAddToTeam->getValue()->get_teamsIParticipate(i) == -2 && first_empty_index == -1) {
+        if (contestantToAddToTeam->value->get_teamsIParticipate(i) == -2 && first_empty_index == -1) {
             first_empty_index =i;
         }
     }
@@ -203,22 +209,23 @@ StatusType Olympics::add_contestant_to_team(int teamId,int contestantId){
     }
     try {
         /*--------------here we updating teams of olympics, only last elem in array----------------------------*/
-        int contestantStrength = contestantToAddToTeam->getValue()->get_strength();
-        teamToAddTo->getValue()->addContestantToATeam(contestantKey, contestantToAddToTeam->getValue() , false);
+        int contestantStrength = contestantToAddToTeam->value->get_strength();
+        teamToAddTo->value->addContestantToATeam(contestantKey, contestantToAddToTeam->value , false);
         //now also need to add contestant to the country
         /*-----------here we updating teams in country, only last elem in array------------------------------------*/
         Country_Key countryKey = Country_Key(countryIdOfContestant);
         auto countryToUpdate = countries->find(countryKey, countries->root);
-        auto teamInCountry = countryToUpdate->getValue()->getCountryTeams()->find(keyOfTeamToAddTo,
-                                                                                  countryToUpdate->getValue()->getCountryTeams()->root);
-        teamInCountry->getValue()->addContestantToATeam(contestantKey, contestantToAddToTeam->getValue() , false);
+        auto teamInCountry = (*countryToUpdate->getValue())->getCountryTeams()->find(keyOfTeamToAddTo,
+                                                                                     (*countryToUpdate->getValue())
+                                                                                  ->getCountryTeams()->root);
+        teamInCountry->value->addContestantToATeam(contestantKey, contestantToAddToTeam->value , false);
         /*------------------------now we are updating all the left teams in the array----------------------------*/
 
         //also need to update it in all the past teams
-        contestantToAddToTeam->getValue()->set_teamsIparticipate(first_empty_index,teamId);
+        contestantToAddToTeam->value->set_teamsIparticipate(first_empty_index,teamId);
         for (int i = 0 ; i < NUM_OF_MAX_TEAMS  ; i++){
 
-            int pastTeamId = contestantToAddToTeam->getValue()->get_teamsIParticipate(i);
+            int pastTeamId = contestantToAddToTeam->value->get_teamsIParticipate(i);
             if (pastTeamId == -2)
             {
                 continue;
@@ -226,10 +233,10 @@ StatusType Olympics::add_contestant_to_team(int teamId,int contestantId){
             //need to update in the country teams tree
             //and also in the teams olympics teams
             Team_Key pastTeamKey = Team_Key(pastTeamId);
-            auto pastTeamToUpdate = teams->find(pastTeamKey, teams->root)->getValue();
+            auto pastTeamToUpdate = teams->find(pastTeamKey, teams->root)->value;
             pastTeamToUpdate->update_contestant_team_array(contestantId,first_empty_index,teamId);
-            auto rootOfCountry = countryToUpdate->getValue()->getCountryTeams();
-            rootOfCountry->find(pastTeamKey, rootOfCountry->root)->getValue()->update_contestant_team_array
+            auto rootOfCountry = (*countryToUpdate->getValue())->getCountryTeams();
+            rootOfCountry->find(pastTeamKey, rootOfCountry->root)->value->update_contestant_team_array
             (contestantId,first_empty_index,teamId);
         }
     }
@@ -255,7 +262,7 @@ StatusType Olympics::remove_contestant_from_team(int teamId,int contestantId){
             return StatusType::FAILURE;
         }
         Contestant_Key contestantKey = *(contestantToFind->getKey());
-        auto tree_of_contestants_in_team = isTeamFound->getValue()->get_team_whole_contestants_by_id();
+        auto tree_of_contestants_in_team = isTeamFound->value->get_team_whole_contestants_by_id();
         if (tree_of_contestants_in_team->find(contestantKey, tree_of_contestants_in_team->root) == nullptr) {
             return StatusType::FAILURE;
         }
@@ -265,34 +272,34 @@ StatusType Olympics::remove_contestant_from_team(int teamId,int contestantId){
         // addcontestanttoteam, only now we update it to -2 instead.
         //remember to remove from the counrty tree and from the olympics tree
         //first to first we update the contestants
-        int countryId = isTeamFound->getValue()->getCountryId();
+        int countryId = isTeamFound->value->getCountryId();
         auto isCountryFound = countries->find(Country_Key(countryId), countries->root);
         assert(isCountryFound != nullptr);
-        auto team_to_remove_from_in_country = isCountryFound->getValue()->getCountryTeams()->find(teamKey,
-                                                                                                   isCountryFound->getValue()->getCountryTeams()->root );
-        team_to_remove_from_in_country->getValue()->removeContestantFromTeam(contestantKey,false);
-        isTeamFound->getValue()->removeContestantFromTeam(contestantKey,false);
+        auto team_to_remove_from_in_country = (*isCountryFound->getValue())->getCountryTeams()->find(teamKey,
+                                                                                                     (*isCountryFound->getValue())->getCountryTeams()->root );
+        team_to_remove_from_in_country->value->removeContestantFromTeam(contestantKey,false);
+        isTeamFound->value->removeContestantFromTeam(contestantKey,false);
         int index_to_update = -1;
         for (int i = 0; i < NUM_OF_MAX_TEAMS; ++i) {
-            if(contestantToFind->getValue()->get_teamsIParticipate(i)==teamId){
+            if(contestantToFind->value->get_teamsIParticipate(i)==teamId){
                 index_to_update = i;
             }
         }
         assert(index_to_update != -1);
-        contestantToFind->getValue()->set_teamsIparticipate(index_to_update, -2);
+        contestantToFind->value->set_teamsIparticipate(index_to_update, -2);
 
-        isCountryFound->getValue()->getCountryContestants()->find(contestantKey, isCountryFound->getValue()
-        ->getCountryContestants()->root)->getValue()->set_teamsIparticipate(index_to_update, -2);
+        (*isCountryFound->getValue())->getCountryContestants()->find(contestantKey, (*isCountryFound->getValue())
+        ->getCountryContestants()->root)->value->set_teamsIparticipate(index_to_update, -2);
         for (int i = 0 ; i < NUM_OF_MAX_TEAMS ; i++) {
-            int teamId_to_update = contestantToFind->getValue()->get_teamsIParticipate(i);
+            int teamId_to_update = contestantToFind->value->get_teamsIParticipate(i);
             if (teamId_to_update == -2) {
                 continue;
             }
             Team_Key pastTeamKey = Team_Key(teamId_to_update);
-            auto pastTeamToUpdate = teams->find(pastTeamKey, teams->root)->getValue();
+            auto pastTeamToUpdate = teams->find(pastTeamKey, teams->root)->value;
             pastTeamToUpdate->update_contestant_team_array(contestantId,index_to_update,-2);
-            auto rootOfCountry = isCountryFound->getValue()->getCountryTeams();
-            rootOfCountry->find(pastTeamKey, rootOfCountry->root)->getValue()->update_contestant_team_array
+            auto rootOfCountry = (*isCountryFound->getValue())->getCountryTeams();
+            rootOfCountry->find(pastTeamKey, rootOfCountry->root)->value->update_contestant_team_array
                     (contestantId,index_to_update,-2);
 
         }
@@ -320,34 +327,34 @@ StatusType Olympics::update_contestant_strength(int contestantId ,int change){
         /*------------------update in contestants--------------------------------*/
         auto contestantInContestants = contestants->find(contestantKey, contestants->root);
         assert(contestantInContestants != nullptr);
-        contestantInContestants->getValue()->set_change_strength(change);
+        contestantInContestants->value->set_change_strength(change);
         contestantInContestants->getKey()->strength += change;
         /*-----------------update in country contestants--------------------------*/
-        Country_Key countryKey = Country_Key(isContestantFound->getValue()->get_countryId());
+        Country_Key countryKey = Country_Key(isContestantFound->value->get_countryId());
         auto countryToUpdate = countries->find(countryKey, countries->root);
-        countryToUpdate->getValue()->getCountryContestants()->find(contestantKey,countryToUpdate->getValue()
-        ->getCountryContestants()->root)->getValue()->set_change_strength(change);
-        countryToUpdate->getValue()->getCountryContestants()->find(contestantKey,countryToUpdate->getValue()
+        (*countryToUpdate->getValue())->getCountryContestants()->find(contestantKey,(*countryToUpdate->getValue()
+        )->getCountryContestants()->root)->value->set_change_strength(change);
+        (*countryToUpdate->getValue())->getCountryContestants()->find(contestantKey,(*countryToUpdate->getValue())
                 ->getCountryContestants()->root)->getKey()->strength += change;
         /*--------------update in country teams and teams---------------------------*/
         for (int i = 0 ; i < NUM_OF_MAX_TEAMS ; i++) {
-            int teamId_to_update = contestantInContestants->getValue()->get_teamsIParticipate(i);
+            int teamId_to_update = contestantInContestants->value->get_teamsIParticipate(i);
             if (teamId_to_update == -2) {
                 continue;
             }
             Team_Key pastTeamKey = Team_Key(teamId_to_update);
             auto pastTeamToUpdate = teams->find(pastTeamKey, teams->root);
             //please notice that contestantKey still doesnt contain the new strength
-            pastTeamToUpdate->getValue()->removeContestantFromTeam(contestantKey, false);
+            pastTeamToUpdate->value->removeContestantFromTeam(contestantKey, false);
             Contestant_Key contestantKeyUpdated = *(contestantInContestants->getKey());
-            pastTeamToUpdate->getValue()->addContestantToATeam(contestantKeyUpdated,contestantInContestants->getValue
-            (), false);
+            pastTeamToUpdate->value->addContestantToATeam(contestantKeyUpdated,contestantInContestants->value
+            , false);
 
-            auto rootOfCountry = countryToUpdate->getValue()->getCountryTeams();
-            rootOfCountry->find(pastTeamKey, rootOfCountry->root)->getValue()->removeContestantFromTeam
+            auto rootOfCountry = (*countryToUpdate->getValue())->getCountryTeams();
+            rootOfCountry->find(pastTeamKey, rootOfCountry->root)->value->removeContestantFromTeam
             (contestantKey, false);
-            rootOfCountry->find(pastTeamKey, rootOfCountry->root)->getValue()->addContestantToATeam(contestantKeyUpdated,contestantInContestants->getValue
-                    (), false);
+            rootOfCountry->find(pastTeamKey, rootOfCountry->root)->value->addContestantToATeam(contestantKeyUpdated,contestantInContestants->value
+                    , false);
 
         }
 
@@ -390,7 +397,7 @@ output_t<int> Olympics::get_medals(int countryId){
     catch(...) {//std::bad_alloc& ba, remember to change it
         return output_t<int>(StatusType::ALLOCATION_ERROR);
     }
-    return output_t<int>(countries->find(Country_Key(countryId),countries->root)->getValue()->getMedals());
+    return output_t<int>((*countries->find(Country_Key(countryId),countries->root)->getValue())->getMedals());
 }
 
 output_t<int> Olympics::get_team_strength(int teamId){
@@ -402,7 +409,7 @@ output_t<int> Olympics::get_team_strength(int teamId){
         if (node == nullptr) {
             return output_t<int>(StatusType::FAILURE);
         }
-        auto team = this->teams->find(Team_Key(teamId),this->teams->root)->getValue();
+        auto team = this->teams->find(Team_Key(teamId),this->teams->root)->value;
         if (team->getNumParticipants()%3==0)
         {
             return output_t<int>(team->get_maxInTreeByStrengthSmallVal().strength + team->get_maxInTreeByStrengthMedVal()
@@ -434,21 +441,21 @@ StatusType Olympics::unite_teams(int teamId1,int teamId2){
         auto teamToAddTo1 = teams->find(keyOfTeamToAddTo1, teams->root);
         Team_Key keyOfTeamToAddTo2 = Team_Key(teamId2);
         auto teamToAddTo2 = teams->find(keyOfTeamToAddTo2, teams->root);
-        int countryIdOf1 = teamToAddTo1->getValue()->getCountryId();
-        int countryIdOf2 = teamToAddTo2->getValue()->getCountryId();
-        Sport *sportOf1 = teamToAddTo1->getValue()->getSport();
-        Sport *sportOf2 = teamToAddTo2->getValue()->getSport();
+        int countryIdOf1 = teamToAddTo1->value->getCountryId();
+        int countryIdOf2 = teamToAddTo2->value->getCountryId();
+        Sport *sportOf1 = teamToAddTo1->value->getSport();
+        Sport *sportOf2 = teamToAddTo2->value->getSport();
         if (countryIdOf1 != countryIdOf2 || *sportOf1 != *sportOf2) {
             return StatusType::FAILURE;
         }
-        while(isTeamTwoFound->getValue()->getNumParticipants()!=0){
-            auto team2_min_node = isTeamTwoFound->getValue()->get_team_whole_contestants_by_id()->findMin
-                    (isTeamTwoFound->getValue()->get_team_whole_contestants_by_id()->root);
-            Contestant team2_min_contestant = *(team2_min_node->getValue());
+        while(isTeamTwoFound->value->getNumParticipants()!=0){
+            auto team2_min_node = isTeamTwoFound->value->get_team_whole_contestants_by_id()->findMin
+                    (isTeamTwoFound->value->get_team_whole_contestants_by_id()->root);
+            //Contestant* team2_min_contestant = *(team2_min_node->getValue());
             Contestant_Key team2_min_Key = *(team2_min_node->getKey());
             //if team2 contestnt does not exist already in team1, add him to team1
-            if(isTeamOneFound->getValue()->get_team_whole_contestants_by_id()->find(team2_min_Key,
-                                                                                    isTeamOneFound->getValue()->get_team_whole_contestants_by_id()->root)==nullptr) {
+            if(isTeamOneFound->value->get_team_whole_contestants_by_id()->find(team2_min_Key,
+                                                                                    isTeamOneFound->value->get_team_whole_contestants_by_id()->root)==nullptr) {
                 //isTeamTwoFound->getValue()->removeContestantFromTeam(team2_min_Key, false);
                 this->remove_contestant_from_team(teamId2,team2_min_Key.id);
                 this->add_contestant_to_team(teamId1, team2_min_Key.id);
@@ -504,8 +511,8 @@ StatusType Olympics::play_match(int teamId1,int teamId2){
         auto teamToAddTo1 = teams->find(keyOfTeamToAddTo1, teams->root);
         Team_Key keyOfTeamToAddTo2 = Team_Key(teamId2);
         auto teamToAddTo2 = teams->find(keyOfTeamToAddTo2, teams->root);
-        int countryIdOf1 = teamToAddTo1->getValue()->getCountryId();
-        int countryIdOf2 = teamToAddTo2->getValue()->getCountryId();
+        int countryIdOf1 = teamToAddTo1->value->getCountryId();
+        int countryIdOf2 = teamToAddTo2->value->getCountryId();
         Country_Key country_key1 = Country_Key(countryIdOf1);
         Country_Key country_key2 = Country_Key(countryIdOf2);
         auto country1_node = this->countries->find(country_key1,this->countries->root);
@@ -513,19 +520,19 @@ StatusType Olympics::play_match(int teamId1,int teamId2){
         assert(country1_node!=nullptr &&  country2_node!= nullptr);
         auto country1= country1_node->getValue();
         auto country2= country2_node->getValue();
-        Sport *sportOf1 = teamToAddTo1->getValue()->getSport();
-        Sport *sportOf2 = teamToAddTo2->getValue()->getSport();
+        Sport *sportOf1 = teamToAddTo1->value->getSport();
+        Sport *sportOf2 = teamToAddTo2->value->getSport();
         if (*sportOf1 != *sportOf2) {
             return StatusType::FAILURE;
         }
-        int nikood_team_1=this->get_strength(teamId1).ans() + country1->getMedals();
-        int nikood_team_2=this->get_strength(teamId2).ans() + country2->getMedals();
+        int nikood_team_1=this->get_strength(teamId1).ans() + (*country1)->getMedals();
+        int nikood_team_2=this->get_strength(teamId2).ans() + (*country2)->getMedals();
         if(nikood_team_1 == nikood_team_2){
             //if equal, dont do anything, but return success(ki ze teko)
             return StatusType::SUCCESS;
         }
         else{
-            nikood_team_1 > nikood_team_2 ? country1->IncMedalCountByOne() : country2->IncMedalCountByOne();
+            nikood_team_1 > nikood_team_2 ? (*country1)->IncMedalCountByOne() : (*country2)->IncMedalCountByOne();
             return StatusType::SUCCESS;
         }
     }
@@ -544,12 +551,12 @@ output_t<int> Olympics::austerity_measures(int teamId){
     if (is_team_found == nullptr) {
         return output_t<int>(StatusType::FAILURE);
     }
-    if (is_team_found->getValue()->get_team_whole_contestants_by_id()->numOfNodes < 3) {
+    if (is_team_found->value->get_team_whole_contestants_by_id()->numOfNodes < 3) {
         return output_t<int>(StatusType::FAILURE);
     }
     int res = 0;
     try {
-        res = is_team_found->getValue()->get_optimalTeamStrength();
+        res = is_team_found->value->get_optimalTeamStrength();
     }
     catch(...) {//std::bad_alloc& ba, remember to change it
         return StatusType::ALLOCATION_ERROR;

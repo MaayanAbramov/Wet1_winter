@@ -16,14 +16,15 @@
 class Country {
     int countryId;
     int medals;
-    AvlTree<Contestant_Key, Contestant>* country_contestants;
-    AvlTree<Team_Key, Team>* country_teams;
+    int init_count;
+    AvlTree<Contestant_Key, Contestant*>* country_contestants;
+    AvlTree<Team_Key, Team*>* country_teams;
 public:
     ~Country();
     Country();
     Country(int countryId, int medals);
-    AvlTree<Team_Key, Team>* getCountryTeams();
-    AvlTree<Contestant_Key, Contestant>* getCountryContestants();
+    AvlTree<Team_Key, Team*>* getCountryTeams();
+    AvlTree<Contestant_Key, Contestant*>* getCountryContestants();
     int getMedals();
     void IncMedalCountByOne();
 };

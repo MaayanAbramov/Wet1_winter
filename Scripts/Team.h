@@ -16,18 +16,18 @@ class Team {
     Sport sport;
     int numParticipants;
     int myCountry;
-    AvlTree<Contestant_Key, Contestant>* team_whole_contestants_by_id;
-    AvlTree<Contestant_Key, Contestant>* team_whole_contestants_by_strength;
+    AvlTree<Contestant_Key, Contestant*>* team_whole_contestants_by_id;
+    AvlTree<Contestant_Key, Contestant*>* team_whole_contestants_by_strength;
 
 
-    AvlTree<Contestant_Key, Contestant>* treeByIdBigVal;
-    AvlTree<Contestant_Key, Contestant>* treeByIdMedVal;
-    AvlTree<Contestant_Key, Contestant>* treeByIdSmallVal;
+    AvlTree<Contestant_Key, Contestant*>* treeByIdBigVal;
+    AvlTree<Contestant_Key, Contestant*>* treeByIdMedVal;
+    AvlTree<Contestant_Key, Contestant*>* treeByIdSmallVal;
 
 
-    AvlTree<Contestant_Key, Contestant>* treeByStrengthBigVal;
-    AvlTree<Contestant_Key, Contestant>* treeByStrengthMedVal;
-    AvlTree<Contestant_Key, Contestant>* treeByStrengthSmallVal;
+    AvlTree<Contestant_Key, Contestant*>* treeByStrengthBigVal;
+    AvlTree<Contestant_Key, Contestant*>* treeByStrengthMedVal;
+    AvlTree<Contestant_Key, Contestant*>* treeByStrengthSmallVal;
     int stateOfBalanceForAdd[3];
     int stateOfBalanceForRemove[3];
 
@@ -85,17 +85,17 @@ public:
     int get_optimalTeamStrength() const;
     void set_optimalTeamStrength(int optimalVal);
 
-    AvlTree<Contestant_Key, Contestant>* get_treeByIdBigVal();
-    AvlTree<Contestant_Key, Contestant>* get_treeByIdMedVal();
-    AvlTree<Contestant_Key, Contestant>* get_treeByIdSmallVal();
+    AvlTree<Contestant_Key, Contestant*>* get_treeByIdBigVal();
+    AvlTree<Contestant_Key, Contestant*>* get_treeByIdMedVal();
+    AvlTree<Contestant_Key, Contestant*>* get_treeByIdSmallVal();
 
 
-    AvlTree<Contestant_Key, Contestant>* get_treeByStrengthBigVal();
-    AvlTree<Contestant_Key, Contestant>* get_treeByStrengthMedVal();
-    AvlTree<Contestant_Key, Contestant>* get_treeByStrengthSmallVal();
+    AvlTree<Contestant_Key, Contestant*>* get_treeByStrengthBigVal();
+    AvlTree<Contestant_Key, Contestant*>* get_treeByStrengthMedVal();
+    AvlTree<Contestant_Key, Contestant*>* get_treeByStrengthSmallVal();
 
-    AvlTree<Contestant_Key, Contestant>* get_team_whole_contestants_by_id();
-    AvlTree<Contestant_Key, Contestant>* get_team_whole_contestants_by_strength();
+    AvlTree<Contestant_Key, Contestant*>* get_team_whole_contestants_by_id();
+    AvlTree<Contestant_Key, Contestant*>* get_team_whole_contestants_by_strength();
 };
 
 #endif //WINTERAVLTREE_TEAM_H
