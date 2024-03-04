@@ -101,9 +101,13 @@ StatusType Olympics::remove_team(int teamId){ //remember there are more teams th
     try {
         Country_Key countryKey = Country_Key(toRemove->value->getCountryId());
         auto nodeOfCountry = countries->find(countryKey, countries->root);
+        Team* toDeleteInCountry = nodeOfCountry->value->getCountryTeams()->find(teamKey,
+                                                                                nodeOfCountry->value->getCountryTeams
+                                                                                ()->root)->value;
         (*(nodeOfCountry->getValue()))->getCountryTeams()->remove(teamKey);
         Team* to_delete = teams->find(teamKey,teams->root)->value;
         teams->remove(teamKey);
+        delete toDeleteInCountry;
         delete to_delete;
     }
     catch(...) {//std::bad_alloc& ba, remember to change it
@@ -221,6 +225,8 @@ StatusType Olympics::add_contestant_to_team(int teamId,int contestantId){
         /*--------------here we updating teams of olympics, only last elem in array----------------------------*/
         int contestantStrength = contestantToAddToTeam->value->get_strength();
         teamToAddTo->value->addContestantToATeam(contestantKey, contestantToAddToTeam->value , false);
+        contestantToAddToTeam->value->set_teamsIparticipate(first_empty_index, -2);//last line worked fine,
+        //it updated the instance of contestant in all the team in teams. now I updates the copy to be just as before
         //now also need to add contestant to the country
         /*-----------here we updating teams in country, only last elem in array------------------------------------*/
         Country_Key countryKey = Country_Key(countryIdOfContestant);
@@ -229,6 +235,10 @@ StatusType Olympics::add_contestant_to_team(int teamId,int contestantId){
                                                                                      (*countryToUpdate->getValue())
                                                                                   ->getCountryTeams()->root);
         teamInCountry->value->addContestantToATeam(contestantKey, contestantToAddToTeam->value , false);
+        /*countryToUpdate->value->getCountryContestants()->find(contestantKey,
+                                                              countryToUpdate->value->getCountryContestants()->root)
+                                                              ->value->set_teamsIparticipate(first_empty_index,
+                                                              teamId);*/
         /*------------------------now we are updating all the left teams in the array----------------------------*/
 
         //also need to update it in all the past teams

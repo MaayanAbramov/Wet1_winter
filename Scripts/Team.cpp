@@ -410,7 +410,7 @@ called_from_optimal) {
     //Contestant toAdd = Contestant(contestantId, countryId, strength, sport, true);
     int index = -1;
     for (int i = 0 ; i < NUM_OF_MAX_TEAMS ; i++) {
-        if (toAdd->get_teamsIParticipate(i) == -2) {
+        if (toAdd->get_teamsIParticipate(i) == -2 && index == -1) {
             index=i;
             break;
         }
@@ -914,7 +914,8 @@ void Team::removeContestantFromTeam(const Contestant_Key&  keyToRemove, bool cal
     }
     else if (keyToRemove.id <= maxInTreeByIdMedVal.id) {
         if (stateOfBalanceForRemove[1] > -1) {
-
+            cont_str_to_delete = treeByStrengthMedVal->find(toRemoveKeyStr,treeByStrengthMedVal->root)->value;
+            cont_id_to_delete = treeByIdMedVal->find(toRemoveKeyId,treeByIdMedVal->root)->value;
             this->treeByStrengthMedVal->remove(toRemoveKeyStr);
             this->treeByIdMedVal->remove(toRemoveKeyId);
             if (treeByIdMedVal->numOfNodes == 0) {
@@ -1019,33 +1020,33 @@ void Team::updateOptimalTeamStrength() {
         else {
             auto contestant_node_MinStrength1 = team_whole_contestants_by_strength->findMin
                     (team_whole_contestants_by_strength->root);
-            auto contestant_MinStrength1 = contestant_node_MinStrength1->value;
+            auto contestant_MinStrength1 = Contestant(*contestant_node_MinStrength1->value);
             this->removeContestantFromTeam(Contestant_Key(*(contestant_node_MinStrength1->getKey())),true);
             /*------------------------------------------------------------------------------------*/
 
             auto contestant_node_MinStrength2 = team_whole_contestants_by_strength->findMin
                     (team_whole_contestants_by_strength->root);
-            auto contestant_MinStrength2 =  contestant_node_MinStrength2->value;
+            auto contestant_MinStrength2 =   Contestant(*contestant_node_MinStrength2->value);
             this->removeContestantFromTeam(Contestant_Key(*contestant_node_MinStrength2->getKey()),true);
             /*------------------------------------------------------------------------------------*/
             auto contestant_node_MinStrength3 = team_whole_contestants_by_strength->findMin
                     (team_whole_contestants_by_strength->root);
-            auto contestant_MinStrength3 = contestant_node_MinStrength3->value;
+            auto contestant_MinStrength3 =  Contestant(*contestant_node_MinStrength3->value);
             this->removeContestantFromTeam(Contestant_Key(*(contestant_node_MinStrength3->getKey())),true);
             /*------------------------------------------------------------------------------------*/
             this->optimalTeamStrength = this->maxInTreeByStrengthSmallVal.strength + this->maxInTreeByStrengthMedVal
                     .strength +
                                         this->maxInTreeByStrengthBigVal.strength;
-            Contestant_Key firstKeyToAdd = Contestant_Key(contestant_MinStrength1->get_contestantId(),
-                                                          contestant_MinStrength1->get_strength(), true);
-            this->addContestantToATeam(firstKeyToAdd, contestant_MinStrength1, true);
-            Contestant_Key secondToAdd = Contestant_Key(contestant_MinStrength2->get_contestantId(),
-                                                        contestant_MinStrength2->get_strength(), true);
+            Contestant_Key firstKeyToAdd = Contestant_Key(contestant_MinStrength1.get_contestantId(),
+                                                          contestant_MinStrength1.get_strength(), true);
+            this->addContestantToATeam(firstKeyToAdd, &contestant_MinStrength1, true);
+            Contestant_Key secondToAdd = Contestant_Key(contestant_MinStrength2.get_contestantId(),
+                                                        contestant_MinStrength2.get_strength(), true);
 
-            this->addContestantToATeam(secondToAdd, contestant_MinStrength2, true);
-            Contestant_Key thirdToAdd = Contestant_Key(contestant_MinStrength3->get_contestantId(),
-                                                       contestant_MinStrength3->get_strength(), true);
-            this->addContestantToATeam(thirdToAdd, contestant_MinStrength3, true);
+            this->addContestantToATeam(secondToAdd, &contestant_MinStrength2, true);
+            Contestant_Key thirdToAdd = Contestant_Key(contestant_MinStrength3.get_contestantId(),
+                                                       contestant_MinStrength3.get_strength(), true);
+            this->addContestantToATeam(thirdToAdd, &contestant_MinStrength3, true);
             /*this->addContestantToATeam(contestant_MinStrength1.get_contestantId(),
                                        contestant_MinStrength1.get_countryId(),
                                        contestant_MinStrength1.get_strength(), contestant_MinStrength1.get_sport(),
