@@ -558,18 +558,13 @@ StatusType Olympics::play_match(int teamId1,int teamId2){
         if (*sportOf1 != *sportOf2) {
             return StatusType::FAILURE;
         }
-        int nikood_team_1=this->get_strength(teamId1).ans() + (*country1)->getMedals();
-        std::cout << "strength of team 1 = " << this->get_strength(teamId1).ans() << ", strength of team 2 = "
-        <<this->get_strength(teamId2).ans() << std:: endl;
-        std::cout << "medals of country 1 = " << (*country1)->getMedals() << ", medals of country 2 = " <<
-         (*country2)->getMedals()<< endl;
-        int nikood_team_2=this->get_strength(teamId2).ans() + (*country2)->getMedals();
+        int nikood_team_1=this->get_team_strength(teamId1).ans() + (*country1)->getMedals();
+        int nikood_team_2=this->get_team_strength(teamId2).ans() + (*country2)->getMedals();
         if(nikood_team_1 == nikood_team_2){
             //if equal, dont do anything, but return success(ki ze teko)
             return StatusType::SUCCESS;
         }
         else{
-            std::cout<<nikood_team_1<<"is 1, "<<nikood_team_2<<"is 2"<<std::endl;
             nikood_team_1 > nikood_team_2 ? (*country1)->IncMedalCountByOne() : (*country2)->IncMedalCountByOne();
             return StatusType::SUCCESS;
         }
