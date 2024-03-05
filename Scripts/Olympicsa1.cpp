@@ -9,8 +9,11 @@ Olympics::Olympics()  {
 }
 
 Olympics::~Olympics(){
-    delete teams;
+    AvlTree<Contestant_Key,Contestant*>::destroy_the_tree_and_values(contestants->root);
     delete contestants;
+    Country::DestroyTreeOfTeams(teams->root);
+    delete teams;
+    AvlTree<Country_Key,Country*>::destroy_the_tree_and_values(countries->root);
     delete countries;
 }
 
@@ -218,6 +221,7 @@ StatusType Olympics::add_contestant_to_team(int teamId,int contestantId){
             break;
         }
     }
+
     if (first_empty_index == -1) {
         return StatusType::FAILURE;
     }
@@ -348,8 +352,10 @@ StatusType Olympics::update_contestant_strength(int contestantId ,int change){
         if (contestantKey.strength + change < 0) {
             return StatusType::FAILURE;
         }
+
         /*------------------update in contestants--------------------------------*/
         auto contestantInContestants = contestants->find(contestantKey, contestants->root);
+        contestantKey = (*contestantInContestants->getKey());//now contestantKey contains the old strength
         assert(contestantInContestants != nullptr);
         contestantInContestants->value->set_change_strength(change);
         contestantInContestants->getKey()->strength += change;
@@ -369,14 +375,17 @@ StatusType Olympics::update_contestant_strength(int contestantId ,int change){
             Team_Key pastTeamKey = Team_Key(teamId_to_update);
             auto pastTeamToUpdate = teams->find(pastTeamKey, teams->root);
             //please notice that contestantKey still doesnt contain the new strength
+            //this->remove_contestant_from_team(teamId_to_update, contestantId);
             pastTeamToUpdate->value->removeContestantFromTeam(contestantKey, false);
             Contestant_Key contestantKeyUpdated = *(contestantInContestants->getKey());
+            //this->add_contestant_to_team(teamId_to_update, contestantId); //should work because uses contestants tree
+            // which is updated
             pastTeamToUpdate->value->addContestantToATeam(contestantKeyUpdated,contestantInContestants->value
             , false);
 
             auto rootOfCountry = (*countryToUpdate->getValue())->getCountryTeams();
             rootOfCountry->find(pastTeamKey, rootOfCountry->root)->value->removeContestantFromTeam
-            (contestantKey, false);
+            (contestantKey, false); //again contestantKey contain the old strength
             rootOfCountry->find(pastTeamKey, rootOfCountry->root)->value->addContestantToATeam(contestantKeyUpdated,contestantInContestants->value
                     , false);
 
@@ -550,12 +559,17 @@ StatusType Olympics::play_match(int teamId1,int teamId2){
             return StatusType::FAILURE;
         }
         int nikood_team_1=this->get_strength(teamId1).ans() + (*country1)->getMedals();
+        std::cout << "strength of team 1 = " << this->get_strength(teamId1).ans() << ", strength of team 2 = "
+        <<this->get_strength(teamId2).ans() << std:: endl;
+        std::cout << "medals of country 1 = " << (*country1)->getMedals() << ", medals of country 2 = " <<
+         (*country2)->getMedals()<< endl;
         int nikood_team_2=this->get_strength(teamId2).ans() + (*country2)->getMedals();
         if(nikood_team_1 == nikood_team_2){
             //if equal, dont do anything, but return success(ki ze teko)
             return StatusType::SUCCESS;
         }
         else{
+            std::cout<<nikood_team_1<<"is 1, "<<nikood_team_2<<"is 2"<<std::endl;
             nikood_team_1 > nikood_team_2 ? (*country1)->IncMedalCountByOne() : (*country2)->IncMedalCountByOne();
             return StatusType::SUCCESS;
         }

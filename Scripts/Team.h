@@ -96,6 +96,8 @@ public:
 
     AvlTree<Contestant_Key, Contestant*>* get_team_whole_contestants_by_id();
     AvlTree<Contestant_Key, Contestant*>* get_team_whole_contestants_by_strength();
+    static void DestroyTeam(Team* team);
+
 };
 
 #endif //WINTERAVLTREE_TEAM_H

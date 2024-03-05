@@ -94,6 +94,7 @@ public:
     Node* find(const Key& key, Node* curr_node) const;
     Node* findMax(Node* curr_node);
     Node* findMin(Node* curr_node);
+    static void destroy_the_tree_and_values(Node* root);
     static int heightDetermination(Node* node);
     static int balanceFactorDetermination(Node* node);
     void updateFieldsAfterChangeInTree(Node* node);
@@ -132,7 +133,21 @@ void AvlTree<Key, Value>::deleteTrivialTree() {
     root = nullptr;
     return;
 }
+template <class Key, class Value>
+void AvlTree<Key,Value>::destroy_the_tree_and_values(Node* root){
+    if(root==nullptr){
+        return;
+    }
+    if(root->left!=nullptr) {
+        destroy_the_tree_and_values(root->left);
+    }
+    if(root->right!=nullptr) {
+        destroy_the_tree_and_values(root->right);
+    }
+    Value value = root->value;
+    delete(value);
 
+}
 template <class Key, class Value>
 typename AvlTree<Key, Value>::Node* AvlTree<Key, Value>::deleteParentOfOneBrotherOnly() {
     assert((root->right == nullptr && root->left != nullptr) || (root->left == nullptr && root->right != nullptr));

@@ -5,7 +5,16 @@
 #include "Team.h"
 
 Team::~Team() {
-    delete team_whole_contestants_by_id; //destructorOfAvlTree?
+    AvlTree<Contestant_Key,Contestant*>::destroy_the_tree_and_values( team_whole_contestants_by_id->root);
+    //destructorOfAvlTree?
+    AvlTree<Contestant_Key,Contestant*>::destroy_the_tree_and_values(team_whole_contestants_by_strength->root);
+    AvlTree<Contestant_Key,Contestant*>::destroy_the_tree_and_values( treeByIdBigVal->root);
+    AvlTree<Contestant_Key,Contestant*>::destroy_the_tree_and_values( treeByIdMedVal->root);
+    AvlTree<Contestant_Key,Contestant*>::destroy_the_tree_and_values(treeByIdSmallVal->root);
+    AvlTree<Contestant_Key,Contestant*>::destroy_the_tree_and_values(treeByStrengthBigVal->root);
+    AvlTree<Contestant_Key,Contestant*>::destroy_the_tree_and_values(treeByStrengthMedVal->root);
+    AvlTree<Contestant_Key,Contestant*>::destroy_the_tree_and_values(treeByStrengthSmallVal->root);
+    delete team_whole_contestants_by_id;
     delete team_whole_contestants_by_strength;
     delete treeByIdBigVal;
     delete treeByIdMedVal;
@@ -13,7 +22,6 @@ Team::~Team() {
     delete treeByStrengthBigVal;
     delete treeByStrengthMedVal;
     delete treeByStrengthSmallVal;
-
     team_whole_contestants_by_id = nullptr; //destructorOfAvlTree?
     team_whole_contestants_by_strength = nullptr;
     treeByIdBigVal = nullptr;
@@ -410,13 +418,18 @@ called_from_optimal) {
     //Contestant toAdd = Contestant(contestantId, countryId, strength, sport, true);
     int index = -1;
     for (int i = 0 ; i < NUM_OF_MAX_TEAMS ; i++) {
+
+        if(toAdd->get_teamsIParticipate(i) == this->teamId){
+            break;
+        }
         if (toAdd->get_teamsIParticipate(i) == -2 && index == -1) {
             index=i;
             break;
         }
     }
-
-    toAdd->set_teamsIparticipate(index, this->teamId);
+    if(index!=-1) {
+        toAdd->set_teamsIparticipate(index, this->teamId);
+    }
     Contestant_Key toAddKeyStr = Contestant_Key(keyToAdd.id, keyToAdd.strength, true);
     //Please notice this one is added to the trees by Id
     Contestant_Key toAddKeyId = Contestant_Key(keyToAdd.id, keyToAdd.strength, false);
@@ -867,6 +880,7 @@ void Team::removeContestantFromTeam(const Contestant_Key&  keyToRemove, bool cal
     Contestant_Key toRemoveKeyId = Contestant_Key(keyToRemove.id, keyToRemove.strength, false);
     Contestant *cont_team_whole_id_to_delete, *cont_team_whole_str_to_delete, *cont_id_to_delete, *cont_str_to_delete;
     cont_team_whole_id_to_delete = team_whole_contestants_by_id->find(toRemoveKeyId,team_whole_contestants_by_id->root)->value;
+    auto forTest = team_whole_contestants_by_strength->find(toRemoveKeyStr,team_whole_contestants_by_strength->root);
     cont_team_whole_str_to_delete = team_whole_contestants_by_strength->find(toRemoveKeyStr,team_whole_contestants_by_strength->root)->value;
     team_whole_contestants_by_id->remove(toRemoveKeyId); //important for austerity_measures
     team_whole_contestants_by_strength->remove(toRemoveKeyStr);

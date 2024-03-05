@@ -27,6 +27,7 @@ public:
     AvlTree<Contestant_Key, Contestant*>* getCountryContestants();
     int getMedals();
     void IncMedalCountByOne();
+    static void DestroyTreeOfTeams(AvlTree<Team_Key,Team*>::Node* root);
 };
 
 #endif //WINTERAVLTREE_COUNTRY_H
