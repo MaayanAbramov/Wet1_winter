@@ -1,6 +1,9 @@
 #include "Olympicsa1.h"
 
 
+void fill_array_of_repeated_contestants(AvlTree<struct Contestant_Key, struct Contestant *> *pTree,
+                                        AvlTree<Contestant_Key, Contestant *>::Node *pNode, Contestant **pContestant,
+                                        Contestant_Key *pKey);
 
 Olympics::Olympics()  {
     this->teams = new AvlTree<Team_Key, Team*>();
@@ -175,7 +178,7 @@ StatusType Olympics::remove_contestant(int contestantId){
     catch(...) {//std::bad_alloc& ba, remember to change it
         return StatusType::ALLOCATION_ERROR;
     }
-    return StatusType::FAILURE;
+    return StatusType::SUCCESS;
 }
 
 bool Olympics::compare_country_ids_and_sports(int teamId, int contestantId){
@@ -193,9 +196,12 @@ bool Olympics::compare_country_ids_and_sports(int teamId, int contestantId){
 
 StatusType Olympics::add_contestant_to_team(int teamId,int contestantId){
     if (teamId <= 0 || contestantId <= 0) {
-        return StatusType::FAILURE;
+        return StatusType::INVALID_INPUT;
     }
     /*----------------------all this to compare the countryIds of contestant and team----------------------*/
+    if (this->teams->find(Team_Key(teamId), teams->root) == nullptr) {
+        return StatusType::FAILURE;
+    }
     bool same_countryid_and_sports = this->compare_country_ids_and_sports(teamId,contestantId);
     if (!same_countryid_and_sports) {
         return StatusType::FAILURE;
@@ -458,11 +464,38 @@ output_t<int> Olympics::get_team_strength(int teamId){
     }
 
 }
+/*
+void Olympics::calc_size_of_complete_tree(AvlTree<Contestant_Key, Contestant*>* team1_tree,AvlTree<Contestant_Key,
+                                          Contestant*>::Node* team2_root, int* size) {
+    if (team2_root == nullptr) {
+        return;
+    }
+    calc_size_of_complete_tree(team1_tree, team2_root->right, size);
+    if (team1_tree->find(*(team2_root->getKey()), team1_tree->root) != nullptr) {
+        (*size)++;
+    }
+    calc_size_of_complete_tree(team1_tree, team2_root->left, size);
+
+}
+void Olympics::fill_array_of_repeated_contestants(AvlTree<Contestant_Key, Contestant*>* team1_tree,
+                                                 AvlTree<Contestant_Key,
+        Contestant*>::Node* team2_root, Contestant** array_obj, Contestant_Key* array_keys, int* size) {
+    if (team2_root == nullptr) {
+        return;
+    }
+    fill_array_of_repeated_contestants(team1_tree, team2_root->right, array_obj, array_keys, size);
+    if (team1_tree->find(*(team2_root->getKey()), team1_tree->root) != nullptr) {
+        array_obj[*size] = team2_root->value;
+        array_keys[*size] = team2_root->key;
+    }
+    fill_array_of_repeated_contestants(team1_tree, team2_root->left, array_obj, array_keys, size);
+}
+*/
 
 StatusType Olympics::unite_teams(int teamId1,int teamId2){
     try {
         if (teamId1 <= 0 || teamId2 <= 0 || teamId1 == teamId2) {
-            return StatusType::FAILURE;
+            return StatusType::INVALID_INPUT;
         }
         auto isTeamOneFound = teams->find(Team_Key(teamId1), teams->root);
         auto isTeamTwoFound = teams->find(Team_Key(teamId2), teams->root);
@@ -481,6 +514,22 @@ StatusType Olympics::unite_teams(int teamId1,int teamId2){
         if (countryIdOf1 != countryIdOf2 || *sportOf1 != *sportOf2) {
             return StatusType::FAILURE;
         }
+
+        /*-----------------added today 5/3----------------------------*/
+        /*auto tree_team_1 = isTeamOneFound->value->get_team_whole_contestants_by_id();
+        auto team2_root = isTeamTwoFound->value->get_team_whole_contestants_by_id()->root;
+        int num_of_nodes_in_complete_tree = 0;
+        calc_size_of_complete_tree(tree_team_1, team2_root, &num_of_nodes_in_complete_tree );
+        AvlTree<Contestant_Key, Contestant*>::createCompleteTree(num_of_nodes_in_complete_tree);
+        Contestant** contestants_in_both_groups = new Contestant*[num_of_nodes_in_complete_tree];
+        Contestant_Key* keys_in_both_groups = new Contestant_Key[num_of_nodes_in_complete_tree];
+        int index = 0;
+        fill_array_of_repeated_contestants(tree_team_1, team2_root, contestants_in_both_groups, keys_in_both_groups,
+                                           &index);
+*/
+
+        /*-------------------------------------------------------------*/
+
         while(isTeamTwoFound->value->getNumParticipants()!=0){
             auto team2_min_node = isTeamTwoFound->value->get_team_whole_contestants_by_id()->findMin
                     (isTeamTwoFound->value->get_team_whole_contestants_by_id()->root);
@@ -488,37 +537,16 @@ StatusType Olympics::unite_teams(int teamId1,int teamId2){
             Contestant_Key team2_min_Key = *(team2_min_node->getKey());
             //if team2 contestnt does not exist already in team1, add him to team1
             if(isTeamOneFound->value->get_team_whole_contestants_by_id()->find(team2_min_Key,
-                                                                                    isTeamOneFound->value->get_team_whole_contestants_by_id()->root)==nullptr) {
-                //isTeamTwoFound->getValue()->removeContestantFromTeam(team2_min_Key, false);
-                this->remove_contestant_from_team(teamId2,team2_min_Key.id);
-                this->add_contestant_to_team(teamId1, team2_min_Key.id);
-                //isTeamOneFound->getValue()->addContestantToATeam(team2_min_Key, &team2_min_contestant, false);
-                //------------------------now do the same for team 1 and teams 2 in CountryTeeams---------------------*/
-                /*Country_Key countryKey  = Country_Key(countryIdOf2); //remember country 1 and country 2 are the same,
-                // otherwise, failure
-                auto node_of_country = countries->find(countryKey, countries->root);
-                assert(node_of_country != nullptr);
-                auto country_teams = node_of_country->getValue()->getCountryTeams();
-                auto team2_in_country = country_teams->find(keyOfTeamToAddTo2, country_teams->root);
-                auto team1_in_country = country_teams->find(keyOfTeamToAddTo1, country_teams->root);
-                assert(team1_in_country != nullptr && team2_in_country != nullptr);
-                auto min_in_team2_of_country = team2_in_country->getValue()->get_team_whole_contestants_by_id()
-                        ->findMin(team2_in_country->getValue()->get_team_whole_contestants_by_id()->root);
-                auto key_of_min_in_team2_of_country = *(min_in_team2_of_country->getKey());
-                //----------------------if team2 contestant does not exist alreadt in team1, add him to team1---------
-                if (team1_in_country->getValue()->get_team_whole_contestants_by_id()->find
-                        (key_of_min_in_team2_of_country, team1_in_country->getValue()->get_team_whole_contestants_by_id()
-                                ->root) == nullptr) { //must be true always because this is a copy the if above
-                    auto contestant_of_min_in_team2_of_country = min_in_team2_of_country->getValue();
-                    team2_in_country->getValue()->removeContestantFromTeam(key_of_min_in_team2_of_country, false);
-                    team1_in_country->getValue()->addContestantToATeam(key_of_min_in_team2_of_country,
-                                                                       contestant_of_min_in_team2_of_country, false);
+                                                                                    isTeamOneFound->value->get_team_whole_contestants_by_id()->root)!=nullptr) { //changed here
+                this->remove_contestant_from_team(teamId2, team2_min_Key.id);//added this line
 
-                }*/
+
             }
             else {
-                continue;
-            }
+            this->remove_contestant_from_team(teamId2, team2_min_Key.id); //changed here from continue
+            this->add_contestant_to_team(teamId1, team2_min_Key.id);
+        }
+
 
         }
         this->remove_team(teamId2);
@@ -596,6 +624,7 @@ output_t<int> Olympics::austerity_measures(int teamId){
     }
     return output_t<int>(res);
 }
+
 
 
 

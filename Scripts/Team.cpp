@@ -451,7 +451,8 @@ called_from_optimal) {
         this->numParticipants++;
         return;
     }
-    if (keyToAdd.id < this->maxInTreeByIdSmallVal.id) {
+    if (keyToAdd.id < this->maxInTreeByIdSmallVal.id || (this->maxInTreeByIdSmallVal.id == 0 && keyToAdd.id <
+        minInTreeByIdMedVal.id)) { //
         if (stateOfBalanceForAdd[0] < 1) {
             this->treeByStrengthSmallVal->insertAux(toAddKeyStr, toAdd_str);
             this->treeByIdSmallVal->insertAux(toAddKeyId, toAdd_id);
@@ -464,7 +465,10 @@ called_from_optimal) {
             updateTreeByStrengthSmallValForAdd();
         }
     }
-    else if (keyToAdd.id < maxInTreeByIdMedVal.id) {
+    else if (keyToAdd.id < maxInTreeByIdMedVal.id || (( stateOfBalanceForAdd[2]==1) &&(keyToAdd.id < minInTreeByIdBigVal
+            .id) || (keyToAdd.id > this->maxInTreeByIdSmallVal.id &&
+                     maxInTreeByIdMedVal.id == 0))
+    ) {
         if (stateOfBalanceForAdd[1] < 1) {
             this->treeByStrengthMedVal->insertAux(toAddKeyStr, toAdd_str);
             this->treeByIdMedVal->insertAux(toAddKeyId, toAdd_id);
@@ -477,6 +481,7 @@ called_from_optimal) {
         }
     }
     else { //which only left the case where strength is bigger that maxInTreeByStrengthBigVal
+
         if (stateOfBalanceForAdd[2] < 1) {
             this->treeByStrengthBigVal->insertAux(toAddKeyStr, toAdd_str);
             this->treeByIdBigVal->insertAux(toAddKeyId, toAdd_id);
@@ -519,6 +524,7 @@ void Team::update_contestant_team_array(int contestantId, int arrayIndex, int te
         }
     whole_id->value->set_teamsIparticipate(arrayIndex,teamId);
     whole_str->value->set_teamsIparticipate(arrayIndex,teamId);
+    auto forTest = tree_to_find_id->find(contestantKey,tree_to_find_id->root);
     tree_to_find_id->find(contestantKey,tree_to_find_id->root)->value->set_teamsIparticipate(arrayIndex,teamId);
     tree_to_find_str->find(contestantKeyStr,tree_to_find_str->root)->value->set_teamsIparticipate(arrayIndex,teamId);
 
@@ -925,6 +931,7 @@ void Team::removeContestantFromTeam(const Contestant_Key&  keyToRemove, bool cal
             }
             updateTreeByStrengthSmallValForRemove();
         }
+
     }
     else if (keyToRemove.id <= maxInTreeByIdMedVal.id) {
         if (stateOfBalanceForRemove[1] > -1) {
@@ -1020,35 +1027,41 @@ void Team::removeContestantFromTeam(const Contestant_Key&  keyToRemove, bool cal
 }
 
 
-void Team::updateOptimalTeamStrength() {
+int Team::updateOptimalTeamStrength_aux(CHOICE choice1, CHOICE choice2, CHOICE choice3) {
+    AvlTree<Contestant_Key,Contestant*> *T1,*T2,*T3;
+       T1= this->choose_tree_by_choice(choice1);
+       T2= this->choose_tree_by_choice(choice2);
+       T3= this->choose_tree_by_choice(choice3);
+       int optimalTeamStrength_aux;
+
     if (team_whole_contestants_by_id->numOfNodes == 0) {
-        optimalTeamStrength = 0;
-        return;
+        optimalTeamStrength_aux = 0;
+        return optimalTeamStrength_aux;
     }
     else {
         if (team_whole_contestants_by_strength->numOfNodes % 3 != 0 || team_whole_contestants_by_strength->numOfNodes
                                                                        == 3) {
-            optimalTeamStrength = 0;
-            return;
+            optimalTeamStrength_aux = 0;
+            return optimalTeamStrength_aux;
         }
         else {
-            auto contestant_node_MinStrength1 = team_whole_contestants_by_strength->findMin
-                    (team_whole_contestants_by_strength->root);
+            auto contestant_node_MinStrength1 = T1->findMin
+                    (T1->root);
             auto contestant_MinStrength1 = Contestant(*contestant_node_MinStrength1->value);
             this->removeContestantFromTeam(Contestant_Key(*(contestant_node_MinStrength1->getKey())),true);
             /*------------------------------------------------------------------------------------*/
 
-            auto contestant_node_MinStrength2 = team_whole_contestants_by_strength->findMin
-                    (team_whole_contestants_by_strength->root);
+            auto contestant_node_MinStrength2 = T2->findMin
+                    (T2->root);
             auto contestant_MinStrength2 =   Contestant(*contestant_node_MinStrength2->value);
             this->removeContestantFromTeam(Contestant_Key(*contestant_node_MinStrength2->getKey()),true);
             /*------------------------------------------------------------------------------------*/
-            auto contestant_node_MinStrength3 = team_whole_contestants_by_strength->findMin
-                    (team_whole_contestants_by_strength->root);
+            auto contestant_node_MinStrength3 = T3->findMin
+                    (T3->root);
             auto contestant_MinStrength3 =  Contestant(*contestant_node_MinStrength3->value);
             this->removeContestantFromTeam(Contestant_Key(*(contestant_node_MinStrength3->getKey())),true);
             /*------------------------------------------------------------------------------------*/
-            this->optimalTeamStrength = this->maxInTreeByStrengthSmallVal.strength + this->maxInTreeByStrengthMedVal
+             optimalTeamStrength_aux = this->maxInTreeByStrengthSmallVal.strength + this->maxInTreeByStrengthMedVal
                     .strength +
                                         this->maxInTreeByStrengthBigVal.strength;
             Contestant_Key firstKeyToAdd = Contestant_Key(contestant_MinStrength1.get_contestantId(),
@@ -1073,7 +1086,7 @@ void Team::updateOptimalTeamStrength() {
                                        contestant_MinStrength3.get_countryId(),
                                        contestant_MinStrength3.get_strength(), contestant_MinStrength3.get_sport(),
                                        true);*/
-
+        return optimalTeamStrength_aux;
         }
 
     }
@@ -1082,3 +1095,36 @@ void Team::updateOptimalTeamStrength() {
 int Team::getNumParticipants() const {
     return this->numParticipants;
 }
+
+AvlTree<Contestant_Key, Contestant *> *Team::choose_tree_by_choice(CHOICE c) {
+    switch(c)
+    {
+        case CHOICE::SMALL:
+            return this->treeByStrengthSmallVal;
+        case CHOICE::MEDIUM:
+            return this->treeByStrengthMedVal;
+        case CHOICE::BIG:
+            return this->treeByStrengthBigVal;
+        default:
+            assert(false);//shouldn't get here.
+    }
+}
+
+void Team::updateOptimalTeamStrength() {
+    int array[10]={0,0,0,0,0,0,0,0,0,0};
+    array[0]=this->updateOptimalTeamStrength_aux(CHOICE::SMALL,CHOICE::SMALL,CHOICE::SMALL);
+    array[1]=this->updateOptimalTeamStrength_aux(CHOICE::SMALL,CHOICE::SMALL,CHOICE::MEDIUM);
+    array[3]=this->updateOptimalTeamStrength_aux(CHOICE::SMALL,CHOICE::SMALL,CHOICE::BIG);
+    array[4]=this->updateOptimalTeamStrength_aux(CHOICE::SMALL,CHOICE::MEDIUM,CHOICE::MEDIUM);
+    array[5]=this->updateOptimalTeamStrength_aux(CHOICE::SMALL,CHOICE::BIG,CHOICE::BIG);
+    array[6]=this->updateOptimalTeamStrength_aux(CHOICE::MEDIUM,CHOICE::MEDIUM,CHOICE::MEDIUM);
+    array[7]=this->updateOptimalTeamStrength_aux(CHOICE::BIG,CHOICE::BIG,CHOICE::BIG);
+    array[8]=this->updateOptimalTeamStrength_aux(CHOICE::MEDIUM, CHOICE::BIG,CHOICE::BIG);
+    array[9]=this->updateOptimalTeamStrength_aux(CHOICE::MEDIUM, CHOICE::MEDIUM,CHOICE::BIG);
+    int max = array[0];
+    for(int i=0;i<10;i++){
+        max = array[i]>max?array[i]:max;
+    }
+    this->optimalTeamStrength=max;
+}
+

@@ -10,7 +10,11 @@
 #include "Contestant_Key.h"
 #include "Contestant.h"
 
-
+enum struct CHOICE {
+    SMALL = 1,
+    MEDIUM = 2,
+    BIG = 3,
+};
 class Team {
     int teamId;
     Sport sport;
@@ -74,6 +78,7 @@ public:
     void removeContestantFromTeam(const Contestant_Key & keyToRemove, bool called_from_optimal); //toRemove should be
     // contestant with flag 0
     void updateTreeByStrengthForTrivialTreesAfterRemove();
+    int updateOptimalTeamStrength_aux(CHOICE,CHOICE,CHOICE);
     void updateOptimalTeamStrength();
     // about the Contestant
     //updates the contestant's teams-array in index arrayIndex in this specific team, to teamID
@@ -97,6 +102,7 @@ public:
     AvlTree<Contestant_Key, Contestant*>* get_team_whole_contestants_by_id();
     AvlTree<Contestant_Key, Contestant*>* get_team_whole_contestants_by_strength();
     static void DestroyTeam(Team* team);
+    AvlTree<Contestant_Key, Contestant*>* choose_tree_by_choice(CHOICE);
 
 };
 

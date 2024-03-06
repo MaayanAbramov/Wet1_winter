@@ -32,6 +32,8 @@ private:
     AvlTree<Contestant_Key, Contestant*>* contestants;
     AvlTree<Country_Key, Country*>* countries;
     bool compare_country_ids_and_sports(int,int);
+
+
 public:
     // <DO-NOT-MODIFY> {
 
