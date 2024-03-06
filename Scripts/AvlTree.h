@@ -79,7 +79,7 @@ public:
             deleteTrivialTree();
         }
         else {
-            deleteLeaf(node);
+            delete node;
         }
 
     }
@@ -144,8 +144,10 @@ void AvlTree<Key,Value>::destroy_the_tree_and_values(Node* root){
     if(root->right!=nullptr) {
         destroy_the_tree_and_values(root->right);
     }
+
     Value value = root->value;
     delete(value);
+    root->value=nullptr;
 
 }
 template <class Key, class Value>
