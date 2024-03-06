@@ -1,6 +1,4 @@
-//
-// Created by maaya on 03/01/2024.
-//
+
 
 #ifndef WINTERAVLTREE_AVLTREE_H
 #define WINTERAVLTREE_AVLTREE_H
@@ -117,7 +115,7 @@ public:
     //int getWeight(Node* root);
     void print2DHelper(Node* root, int space);
     void print2D(Node* root);
-public: //TO DO : change it to private
+public: 
     Node* root;
     int numOfNodes;
 };
@@ -300,9 +298,9 @@ void AvlTree<Key, Value>::rotationLR(Node* node){ //same as beneath
     Node* tempC = node;
     assert(tempC->left != nullptr && tempC->left->right != nullptr);
     Node* tempA = tempC->left;
-    rotationRR(tempA); //notice that this line was tempC->left = rotationRR(tempA);
+    rotationRR(tempA); 
     tempC->left->father = tempC;
-    rotationLL(tempC); //notice to the difference with rotation RL
+    rotationLL(tempC); 
     return;
 }
 
@@ -312,9 +310,9 @@ void AvlTree<Key, Value>::rotationRL(Node* node){ // to understand this you shou
     Node* tempC = node;
     assert(tempC->right != nullptr && tempC->right->left != nullptr);
     Node* tempA = tempC->right;
-    rotationLL(tempA); //tempC->right = rotationLL(tempA);
+    rotationLL(tempA); 
     tempC->right->father = tempC;
-    rotationRR(tempC); //this value should be returned, I changed it
+    rotationRR(tempC); 
     return;
 }
 
